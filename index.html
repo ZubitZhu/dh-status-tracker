@@ -294,41 +294,47 @@
     .pip-grid {
       display: flex;
       flex-wrap: wrap;
-      gap: 8px;
+      gap: 10px;
       justify-content: center;
-      padding: 4px 0 8px;
+      padding: 4px 0 6px;
     }
 
+    /* Rombo base — ruotato 45deg, bordo netto */
     .pip {
-      width: 36px;
-      height: 36px;
-      border-radius: 50%;
+      width: 28px;
+      height: 28px;
+      border-radius: 4px;
       border: 2px solid var(--red-dim);
       background: transparent;
       cursor: pointer;
+      transform: rotate(45deg);
       transition:
         background var(--transition),
         border-color var(--transition),
-        transform 0.1s ease,
         box-shadow var(--transition);
       -webkit-tap-highlight-color: transparent;
       position: relative;
+      flex-shrink: 0;
     }
 
+    /* Riempimento interno — quadrato anch'esso ruotato (appare dritto dentro il rombo) */
     .pip::after {
       content: '';
       position: absolute;
       inset: 4px;
-      border-radius: 50%;
+      border-radius: 2px;
       background: var(--red);
       opacity: 0;
-      transform: scale(0.4);
-      transition: opacity 0.15s ease, transform 0.15s ease;
+      transform: scale(0.3);
+      transition: opacity 0.14s ease, transform 0.14s ease;
     }
 
     .pip.filled {
       border-color: var(--red);
-      box-shadow: 0 0 10px var(--red-glow), inset 0 0 6px rgba(192,74,58,0.25);
+      background: rgba(255,124,92,0.10);
+      box-shadow:
+        0 0 8px var(--red-glow),
+        0 0 2px var(--red-glow);
     }
 
     .pip.filled::after {
@@ -336,8 +342,9 @@
       transform: scale(1);
     }
 
+    /* Il tap feedback deve fare scale senza perdere il rotate */
     .pip:active {
-      transform: scale(0.88);
+      transform: rotate(45deg) scale(0.82);
     }
 
     /* ─── PF STATUS LABEL ───────────────────────────────────────── */
@@ -525,7 +532,7 @@
      MODULO 3 — STRESS
   ═══════════════════════════════════════════════════════════════ */
 
-  /* Pip stress (colore blu, stessa struttura dei PF) */
+  /* Pip stress — rombo blu */
   .pip.stress {
     border-color: var(--blue-dim);
   }
@@ -534,7 +541,10 @@
   }
   .pip.stress.filled {
     border-color: var(--blue);
-    box-shadow: 0 0 10px var(--blue-glow), inset 0 0 6px rgba(58,122,191,0.25);
+    background: rgba(114,184,240,0.10);
+    box-shadow:
+      0 0 8px var(--blue-glow),
+      0 0 2px var(--blue-glow);
   }
 
   /* Banner vulnerabile */
@@ -885,6 +895,230 @@
     transform: scale(0.97);
   }
 
+
+  /* ═══════════════════════════════════════════════════════════════
+     COMPACT VITALS SECTION
+  ═══════════════════════════════════════════════════════════════ */
+
+  .section-body.compact {
+    padding: 12px 14px;
+  }
+
+  .vital-block {
+    padding: 4px 0;
+  }
+
+  .vital-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 6px;
+  }
+
+  .vital-label {
+    font-family: 'Cinzel', serif;
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+  }
+  .vital-label.red  { color: var(--red); }
+  .vital-label.blue { color: var(--blue); }
+  .vital-label.gold { color: var(--gold); }
+
+  .vital-fraction {
+    display: flex;
+    align-items: baseline;
+    gap: 3px;
+  }
+
+  .vital-controls {
+    margin-top: 8px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  /* Pip compatti */
+  .compact-pips {
+    gap: 10px;
+    padding: 2px 0 4px;
+  }
+
+  .compact-pips .pip {
+    width: 26px;
+    height: 26px;
+  }
+
+  /* Fraction speranza (oro) */
+  .hope-fraction {
+    font-family: 'Cinzel', serif;
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--gold);
+    letter-spacing: 0.05em;
+  }
+
+  .hope-fraction-max {
+    font-family: 'Cinzel', serif;
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--text-dim);
+  }
+
+  /* Pip speranza — rombo oro */
+  .pip.hope {
+    border-color: var(--gold-dim);
+  }
+  .pip.hope::after {
+    background: var(--gold);
+  }
+  .pip.hope.filled {
+    border-color: var(--gold);
+    background: rgba(240,180,41,0.12);
+    box-shadow:
+      0 0 8px var(--gold-glow),
+      0 0 2px var(--gold-glow);
+  }
+
+  /* Bottoni speranza (dorati) */
+  .hope-btn {
+    border-color: var(--gold-dim) !important;
+    color: var(--gold) !important;
+  }
+  .hope-btn:active {
+    background: rgba(240,180,41,0.15) !important;
+    border-color: var(--gold) !important;
+  }
+
+  /* Max row compatta */
+  .vital-controls .max-row {
+    padding-top: 0;
+  }
+
+  /* Bottone cicatrice */
+  .cicatrice-btn {
+    background: transparent;
+    border: 1px solid var(--gold-dim);
+    border-radius: var(--radius-sm);
+    color: var(--gold-dim);
+    font-family: 'Cinzel', serif;
+    font-size: 0.68rem;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    padding: 7px 12px;
+    cursor: pointer;
+    width: 100%;
+    transition: border-color var(--transition), color var(--transition), background var(--transition);
+    -webkit-tap-highlight-color: transparent;
+  }
+  .cicatrice-btn:active {
+    border-color: var(--gold);
+    color: var(--gold);
+    background: rgba(240,180,41,0.08);
+  }
+
+  /* Divider più stretto dentro vitals */
+  .section-body.compact .divider {
+    margin: 10px 0;
+  }
+
+  /* ─── MODAL CICATRICE ─────────────────────────────────────────── */
+  .cicatrice-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(10,8,6,0.80);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 201;
+    padding: 24px;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.25s ease;
+    backdrop-filter: blur(3px);
+    -webkit-backdrop-filter: blur(3px);
+  }
+  .cicatrice-overlay.visible {
+    opacity: 1;
+    pointer-events: all;
+  }
+  .cicatrice-modal {
+    background: var(--surface);
+    border: 1px solid var(--gold-dim);
+    border-radius: var(--radius);
+    padding: 26px 22px 20px;
+    max-width: 340px;
+    width: 100%;
+    text-align: center;
+    box-shadow: 0 0 40px rgba(240,180,41,0.12), var(--shadow);
+    transform: translateY(10px) scale(0.97);
+    transition: transform 0.25s ease;
+    position: relative;
+    overflow: hidden;
+  }
+  .cicatrice-overlay.visible .cicatrice-modal {
+    transform: translateY(0) scale(1);
+  }
+  .cicatrice-modal::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, var(--gold-dim), transparent);
+  }
+  .cicatrice-modal-title {
+    font-family: 'Cinzel', serif;
+    font-size: 1rem;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 10px;
+  }
+  .cicatrice-modal-body {
+    font-size: 0.88rem;
+    color: var(--text-dim);
+    line-height: 1.6;
+    margin-bottom: 18px;
+  }
+  .cicatrice-modal-body strong {
+    color: var(--text);
+  }
+  .cicatrice-modal-btns {
+    display: flex;
+    gap: 10px;
+  }
+  .cicatrice-modal-btns button {
+    flex: 1;
+    border-radius: var(--radius-sm);
+    font-family: 'Cinzel', serif;
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    padding: 11px 8px;
+    cursor: pointer;
+    transition: background var(--transition), transform 0.1s;
+    -webkit-tap-highlight-color: transparent;
+  }
+  #cicatriceCancel {
+    background: transparent;
+    border: 1px solid var(--border-light);
+    color: var(--text-dim);
+  }
+  #cicatriceCancel:active { background: var(--border); }
+  #cicatriceConfirm {
+    background: rgba(240,180,41,0.12);
+    border: 1px solid var(--gold-dim);
+    color: var(--gold);
+  }
+  #cicatriceConfirm:active {
+    background: rgba(240,180,41,0.25);
+    transform: scale(0.97);
+  }
+
 </style>
 </head>
 <body>
@@ -910,84 +1144,101 @@
     />
   </div>
 
-  <!-- SEZIONE PF -->
-  <section class="section" id="section-pf">
+  <!-- SEZIONE UNIFICATA: PF + STRESS + SPERANZA -->
+  <section class="section" id="section-vitals">
     <div class="section-header">
-      <span class="section-title">Punti Ferita</span>
-      <div class="pf-counter-row" style="margin:0;gap:4px;">
-        <span class="pf-fraction" id="pfCurrent">0</span>
-        <span class="pf-fraction-sep">/</span>
-        <span class="pf-fraction-max" id="pfMaxDisplay">6</span>
-      </div>
+      <span class="section-title">Condizione</span>
     </div>
-    <div class="section-body">
-      <div class="pf-status" id="pfStatus"></div>
-      <div class="pip-grid" id="pfPips"></div>
-      <div class="divider"></div>
-      <div class="max-row">
-        <span class="max-label">Massimo PF</span>
-        <div class="max-control">
-          <button class="max-btn" id="pfMaxDec">&#8722;</button>
-          <span class="max-value" id="pfMaxValue">6</span>
-          <button class="max-btn" id="pfMaxInc">+</button>
+    <div class="section-body compact">
+
+      <!-- ── PUNTI FERITA ── -->
+      <div class="vital-block">
+        <div class="vital-header">
+          <span class="vital-label red">Punti Ferita</span>
+          <div class="vital-fraction">
+            <span class="pf-fraction" id="pfCurrent">0</span>
+            <span class="pf-fraction-sep">/</span>
+            <span class="pf-fraction-max" id="pfMaxDisplay">6</span>
+          </div>
         </div>
-      </div>
-      <div class="divider"></div>
-      <div class="damage-row">
-        <button class="dmg-btn" id="dmg1"><span>+1</span><small>Ferita minore</small></button>
-        <button class="dmg-btn" id="dmg2"><span>+2</span><small>Ferita grave</small></button>
-        <button class="dmg-btn" id="dmg3"><span>+3</span><small>Ferita critica</small></button>
-      </div>
-      <a class="reset-link" id="pfReset">&#8635; Azzera PF</a>
-    </div>
-  </section>
-
-  <!-- SEZIONE STRESS -->
-  <section class="section" id="section-stress">
-    <div class="section-header">
-      <span class="section-title">Stress</span>
-      <div class="pf-counter-row" style="margin:0;gap:4px;">
-        <span class="stress-fraction" id="stressCurrent">0</span>
-        <span class="pf-fraction-sep">/</span>
-        <span class="stress-fraction-max" id="stressMaxDisplay">6</span>
-      </div>
-    </div>
-    <div class="section-body">
-
-      <!-- Banner vulnerabile -->
-      <div class="vulnerable-banner" id="vulnerableBanner">
-        <span class="vulnerable-icon">&#9888;</span>
-        <div class="vulnerable-text">
-          <strong>Vulnerabile</strong>
-          <span>Sei al massimo dello stress — sei vulnerabile.</span>
-        </div>
-      </div>
-
-      <!-- Pip grid stress -->
-      <div class="pip-grid" id="stressPips"></div>
-
-      <div class="divider"></div>
-
-      <!-- Max setter -->
-      <div class="max-row">
-        <span class="max-label">Massimo Stress</span>
-        <div class="max-control">
-          <button class="max-btn" id="stressMaxDec">&#8722;</button>
-          <span class="max-value" id="stressMaxValue">6</span>
-          <button class="max-btn" id="stressMaxInc">+</button>
+        <div class="pf-status" id="pfStatus"></div>
+        <div class="pip-grid compact-pips" id="pfPips"></div>
+        <div class="vital-controls">
+          <div class="max-row">
+            <span class="max-label">Max</span>
+            <div class="max-control">
+              <button class="max-btn" id="pfMaxDec">&#8722;</button>
+              <span class="max-value" id="pfMaxValue">6</span>
+              <button class="max-btn" id="pfMaxInc">+</button>
+            </div>
+          </div>
+          <div class="damage-row compact-dmg">
+            <button class="dmg-btn" id="dmg1"><span>+1</span><small>Minore</small></button>
+            <button class="dmg-btn" id="dmg2"><span>+2</span><small>Grave</small></button>
+            <button class="dmg-btn" id="dmg3"><span>+3</span><small>Critica</small></button>
+          </div>
+          <a class="reset-link" id="pfReset">&#8635; Azzera PF</a>
         </div>
       </div>
 
       <div class="divider"></div>
 
-      <!-- Bottoni rapidi +1 / -1 -->
-      <div class="stress-quick-row">
-        <button class="stress-quick-btn" id="stressDec"><span>&#8722;1</span><small>Riduci stress</small></button>
-        <button class="stress-quick-btn" id="stressInc"><span>+1</span><small>Aggiungi stress</small></button>
+      <!-- ── STRESS ── -->
+      <div class="vital-block">
+        <div class="vital-header">
+          <span class="vital-label blue">Stress</span>
+          <div class="vital-fraction">
+            <span class="stress-fraction" id="stressCurrent">0</span>
+            <span class="pf-fraction-sep">/</span>
+            <span class="stress-fraction-max" id="stressMaxDisplay">6</span>
+          </div>
+        </div>
+        <div class="vulnerable-banner" id="vulnerableBanner">
+          <span class="vulnerable-icon">&#9888;</span>
+          <div class="vulnerable-text">
+            <strong>Vulnerabile</strong>
+            <span>Sei al massimo dello stress.</span>
+          </div>
+        </div>
+        <div class="pip-grid compact-pips" id="stressPips"></div>
+        <div class="vital-controls">
+          <div class="max-row">
+            <span class="max-label">Max</span>
+            <div class="max-control">
+              <button class="max-btn" id="stressMaxDec">&#8722;</button>
+              <span class="max-value" id="stressMaxValue">6</span>
+              <button class="max-btn" id="stressMaxInc">+</button>
+            </div>
+          </div>
+          <div class="stress-quick-row">
+            <button class="stress-quick-btn" id="stressDec"><span>&#8722;1</span><small>Riduci</small></button>
+            <button class="stress-quick-btn" id="stressInc"><span>+1</span><small>Aggiungi</small></button>
+          </div>
+          <a class="reset-link" id="stressReset">&#8635; Azzera Stress</a>
+        </div>
       </div>
 
-      <!-- Reset -->
-      <a class="reset-link" id="stressReset">&#8635; Azzera Stress</a>
+      <div class="divider"></div>
+
+      <!-- ── SPERANZA ── -->
+      <div class="vital-block">
+        <div class="vital-header">
+          <span class="vital-label gold">Speranza</span>
+          <div class="vital-fraction">
+            <span class="hope-fraction" id="hopeCurrent">2</span>
+            <span class="pf-fraction-sep">/</span>
+            <span class="hope-fraction-max" id="hopeMaxDisplay">6</span>
+          </div>
+        </div>
+        <div class="pip-grid compact-pips" id="hopePips"></div>
+        <div class="vital-controls">
+          <div class="stress-quick-row">
+            <button class="stress-quick-btn hope-btn" id="hopeDec"><span>&#8722;1</span><small>Spendi</small></button>
+            <button class="stress-quick-btn hope-btn" id="hopeInc"><span>+1</span><small>Guadagna</small></button>
+          </div>
+          <button class="cicatrice-btn" id="cicatriceBtn">&#10010; Cicatrice</button>
+        </div>
+      </div>
 
     </div>
   </section>
@@ -1072,6 +1323,21 @@
   </div>
 </div>
 
+<!-- CICATRICE MODAL -->
+<div class="cicatrice-overlay" id="cicatriceOverlay">
+  <div class="cicatrice-modal">
+    <div class="cicatrice-modal-title">&#10010; Cicatrice</div>
+    <div class="cicatrice-modal-body">
+      Stai per ridurre <strong>permanentemente</strong> il tuo massimo di Speranza di 1.<br><br>
+      Questa azione <strong>non è reversibile</strong>. Sei sicuro?
+    </div>
+    <div class="cicatrice-modal-btns">
+      <button id="cicatriceCancel">Annulla</button>
+      <button id="cicatriceConfirm">Confermo</button>
+    </div>
+  </div>
+</div>
+
   <div class="safe-bottom"></div>
 </div>
 
@@ -1086,17 +1352,31 @@
   const STORAGE_KEY = 'daggerheart_v1';
 
   const defaultState = {
-    charName: '',
-    pf:       { max: 6,  current: 0 },
-    stress:   { max: 6,  current: 0 },
-    oro:      { monete: 0, manciate: 0, sacchi: 0, casse: 0 }
+    charName:  '',
+    pf:        { max: 6, current: 0 },
+    stress:    { max: 6, current: 0 },
+    speranza:  { max: 6, current: 2 },
+    oro:       { monete: 0, manciate: 0, sacchi: 0, casse: 0 }
   };
 
   function loadState() {
     try {
       const raw = localStorage.getItem(STORAGE_KEY);
       if (!raw) return structuredClone(defaultState);
-      return Object.assign(structuredClone(defaultState), JSON.parse(raw));
+      const saved   = JSON.parse(raw);
+      const def     = structuredClone(defaultState);
+      // Merge profondo: i sotto-oggetti vengono uniti campo per campo
+      // così i nuovi campi (es. speranza) appaiono anche su dati vecchi
+      for (const key of Object.keys(def)) {
+        if (saved[key] !== undefined) {
+          if (typeof def[key] === 'object' && def[key] !== null && !Array.isArray(def[key])) {
+            def[key] = Object.assign(def[key], saved[key]);
+          } else {
+            def[key] = saved[key];
+          }
+        }
+      }
+      return def;
     } catch {
       return structuredClone(defaultState);
     }
@@ -1459,6 +1739,81 @@
       saveState(state);
       render();
       showToast('Tesoro azzerato');
+    });
+
+    render();
+  })();
+
+
+  /* ═══════════════════════════════════════════════════════════════
+     MODULO SPERANZA
+  ═══════════════════════════════════════════════════════════════ */
+  (function initSperanza() {
+    const pipsEl       = document.getElementById('hopePips');
+    const currentEl    = document.getElementById('hopeCurrent');
+    const maxDisplayEl = document.getElementById('hopeMaxDisplay');
+
+    function render() {
+      const { max, current } = state.speranza;
+      currentEl.textContent    = current;
+      maxDisplayEl.textContent = max;
+
+      pipsEl.innerHTML = '';
+      for (let i = 1; i <= max; i++) {
+        const pip = document.createElement('button');
+        pip.className = 'pip hope' + (i <= current ? ' filled' : '');
+        pip.setAttribute('aria-label', 'Speranza ' + i);
+        pip.addEventListener('click', () => {
+          if (i === state.speranza.current) {
+            state.speranza.current = i - 1;
+          } else {
+            state.speranza.current = Math.min(i, state.speranza.max);
+          }
+          saveState(state);
+          render();
+        });
+        pipsEl.appendChild(pip);
+      }
+    }
+
+    function changeHope(delta) {
+      state.speranza.current = Math.max(0, Math.min(state.speranza.current + delta, state.speranza.max));
+      saveState(state);
+      render();
+    }
+
+    document.getElementById('hopeInc').addEventListener('click', () => changeHope(+1));
+    document.getElementById('hopeDec').addEventListener('click', () => changeHope(-1));
+
+    // Cicatrice
+    const overlay   = document.getElementById('cicatriceOverlay');
+    const btnOpen   = document.getElementById('cicatriceBtn');
+    const btnCancel = document.getElementById('cicatriceCancel');
+    const btnConfirm= document.getElementById('cicatriceConfirm');
+
+    btnOpen.addEventListener('click', () => {
+      if (state.speranza.max <= 1) {
+        showToast('Speranza già al minimo.');
+        return;
+      }
+      overlay.classList.add('visible');
+    });
+
+    btnCancel.addEventListener('click', () => overlay.classList.remove('visible'));
+
+    overlay.addEventListener('click', (e) => {
+      if (e.target === overlay) overlay.classList.remove('visible');
+    });
+
+    btnConfirm.addEventListener('click', () => {
+      overlay.classList.remove('visible');
+      state.speranza.max = Math.max(1, state.speranza.max - 1);
+      if (state.speranza.current > state.speranza.max) {
+        state.speranza.current = state.speranza.max;
+      }
+      saveState(state);
+      render();
+      showToast('Cicatrice segnata — max Speranza: ' + state.speranza.max, 3000);
     });
 
     render();
