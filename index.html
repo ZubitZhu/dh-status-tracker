@@ -776,6 +776,115 @@
     display: flex;
   }
 
+
+  /* ═══════════════════════════════════════════════════════════════
+     DEATH MOVE MODAL
+  ═══════════════════════════════════════════════════════════════ */
+  .death-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(10, 8, 6, 0.82);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 200;
+    padding: 24px;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.28s ease;
+    backdrop-filter: blur(3px);
+    -webkit-backdrop-filter: blur(3px);
+  }
+
+  .death-overlay.visible {
+    opacity: 1;
+    pointer-events: all;
+  }
+
+  .death-modal {
+    background: var(--surface);
+    border: 1px solid var(--red-dim);
+    border-radius: var(--radius);
+    padding: 32px 28px 26px;
+    max-width: 360px;
+    width: 100%;
+    text-align: center;
+    box-shadow: 0 0 48px rgba(255,124,92,0.18), var(--shadow);
+    transform: translateY(12px) scale(0.97);
+    transition: transform 0.28s ease;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .death-overlay.visible .death-modal {
+    transform: translateY(0) scale(1);
+  }
+
+  .death-modal::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, transparent, var(--red), transparent);
+  }
+
+  .death-modal-icon {
+    font-size: 2.4rem;
+    line-height: 1;
+    margin-bottom: 14px;
+    display: block;
+    animation: death-pulse 1.8s ease-in-out infinite;
+  }
+
+  @keyframes death-pulse {
+    0%, 100% { opacity: 1;   transform: scale(1);    }
+    50%       { opacity: 0.6; transform: scale(0.92); }
+  }
+
+  .death-modal-title {
+    font-family: 'Cinzel', serif;
+    font-size: 1.15rem;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--red);
+    margin-bottom: 12px;
+  }
+
+  .death-modal-body {
+    font-size: 0.95rem;
+    color: var(--text-dim);
+    line-height: 1.6;
+    margin-bottom: 24px;
+  }
+
+  .death-modal-body strong {
+    color: var(--text);
+    font-weight: 600;
+  }
+
+  .death-modal-btn {
+    background: var(--red-dim);
+    border: 1px solid var(--red);
+    border-radius: var(--radius-sm);
+    color: var(--text);
+    font-family: 'Cinzel', serif;
+    font-size: 0.82rem;
+    font-weight: 700;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    padding: 13px 28px;
+    cursor: pointer;
+    width: 100%;
+    transition: background var(--transition), transform 0.1s ease;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .death-modal-btn:active {
+    background: var(--red);
+    transform: scale(0.97);
+  }
+
 </style>
 </head>
 <body>
@@ -949,6 +1058,20 @@
     </div>
   </section>
 
+<!-- DEATH MOVE MODAL -->
+<div class="death-overlay" id="deathOverlay">
+  <div class="death-modal" role="dialog" aria-modal="true" aria-labelledby="deathTitle">
+    <span class="death-modal-icon">&#9760;</span>
+    <div class="death-modal-title" id="deathTitle">Death Move</div>
+    <div class="death-modal-body">
+      Hai subito l'ultimo punto ferita.<br><br>
+      <strong>Devi eseguire una Death Move.</strong><br>
+      Descrivi come il tuo personaggio affronta questo momento — potresti morire, o forse no.
+    </div>
+    <button class="death-modal-btn" id="deathDismiss">Ho capito</button>
+  </div>
+</div>
+
   <div class="safe-bottom"></div>
 </div>
 
@@ -1011,6 +1134,21 @@
   // Espone globalmente per i moduli successivi
   window.DH = { state, saveState, showToast, loadState };
 
+
+  /* ─── DEATH MOVE MODAL ──────────────────────────────────────── */
+  function showDeathModal() {
+    document.getElementById('deathOverlay').classList.add('visible');
+  }
+
+  document.getElementById('deathDismiss').addEventListener('click', () => {
+    document.getElementById('deathOverlay').classList.remove('visible');
+  });
+
+  // Chiudi anche toccando fuori dal modal
+  document.getElementById('deathOverlay').addEventListener('click', function(e) {
+    if (e.target === this) this.classList.remove('visible');
+  });
+
   /* ═══════════════════════════════════════════════════════════════
      MODULO 2 — PUNTI FERITA
   ═══════════════════════════════════════════════════════════════ */
@@ -1056,6 +1194,7 @@
     }
 
     function togglePip(index) {
+      const prev = state.pf.current;
       if (index === state.pf.current) {
         state.pf.current = index - 1;
       } else {
@@ -1063,6 +1202,9 @@
       }
       saveState(state);
       render();
+      if (state.pf.current === state.pf.max && prev < state.pf.max) {
+        showDeathModal();
+      }
     }
 
     function applyDamage(amount) {
@@ -1071,7 +1213,7 @@
       saveState(state);
       render();
       if (state.pf.current === state.pf.max && prev < state.pf.max) {
-        showToast('\u26a0 Sei in fin di vita!', 3200);
+        showDeathModal();
       }
     }
 
