@@ -1,0 +1,1328 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
+  <title>Daggerheart Tracker</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Crimson+Pro:ital,wght@0,300;0,400;0,600;1,300;1,400&display=swap" rel="stylesheet" />
+
+  <style>
+    /* ─── RESET & BASE ─────────────────────────────────────────── */
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    :root {
+      --bg:           #252830;
+      --surface:      #2e3038;
+      --surface-2:    #353840;
+      --border:       #484e5c;
+      --border-light: #585e6c;
+      --gold:         #f0b429;
+      --gold-dim:     #9a7418;
+      --gold-glow:    rgba(240,180,41,0.18);
+      --red:          #ff7c5c;
+      --red-dim:      #7a3020;
+      --red-glow:     rgba(255,124,92,0.22);
+      --blue:         #72b8f0;
+      --blue-dim:     #2d5f8a;
+      --blue-glow:    rgba(114,184,240,0.22);
+      --text:         #f2ede4;
+      --text-dim:     #ccc8c0;
+      --text-muted:   #a8a49c;
+      --radius:       10px;
+      --radius-sm:    6px;
+      --shadow:       0 4px 24px rgba(0,0,0,0.5);
+      --transition:   0.18s ease;
+    }
+
+    html, body {
+      height: 100%;
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Crimson Pro', Georgia, serif;
+      font-size: 18px;
+      line-height: 1.5;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ─── LAYOUT ────────────────────────────────────────────────── */
+    .app {
+      min-height: 100dvh;
+      max-width: 480px;
+      margin: 0 auto;
+      padding: 0 0 80px;
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+    }
+
+    /* ─── HEADER ────────────────────────────────────────────────── */
+    .app-header {
+      padding: 28px 24px 20px;
+      text-align: center;
+      border-bottom: 1px solid var(--border);
+      position: relative;
+    }
+
+    .app-header::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(ellipse at 50% 0%, rgba(240,180,41,0.09) 0%, transparent 65%);
+      pointer-events: none;
+    }
+
+    .app-title {
+      font-family: 'Cinzel', serif;
+      font-size: 1.5rem;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      color: var(--gold);
+      text-transform: uppercase;
+    }
+
+    .app-subtitle {
+      font-size: 0.82rem;
+      color: var(--text-dim);
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      margin-top: 2px;
+    }
+
+    /* ─── CHAR NAME ─────────────────────────────────────────────── */
+    .char-name-wrap {
+      padding: 16px 24px 0;
+    }
+
+    .char-name-input {
+      width: 100%;
+      background: transparent;
+      border: none;
+      border-bottom: 1px solid var(--border-light);
+      color: var(--text);
+      font-family: 'Cinzel', serif;
+      font-size: 1.1rem;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-align: center;
+      padding: 6px 0;
+      outline: none;
+      transition: border-color var(--transition);
+    }
+
+    .char-name-input::placeholder {
+      color: var(--text-muted);
+      font-weight: 400;
+    }
+
+    .char-name-input:focus {
+      border-bottom-color: var(--gold);
+    }
+
+    /* ─── SECTION CARD ──────────────────────────────────────────── */
+    .section {
+      margin: 20px 16px 0;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+      box-shadow: var(--shadow);
+    }
+
+    .section-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 14px 18px 12px;
+      border-bottom: 1px solid var(--border);
+      background: var(--surface-2);
+    }
+
+    .section-title {
+      font-family: 'Cinzel', serif;
+      font-size: 0.78rem;
+      font-weight: 600;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: var(--text-dim);
+    }
+
+    .section-body {
+      padding: 20px 18px;
+    }
+
+    /* ─── DIVIDER ───────────────────────────────────────────────── */
+    .divider {
+      height: 1px;
+      background: var(--border);
+      margin: 16px 0;
+    }
+
+    /* ─── COUNTER CONTROL ───────────────────────────────────────── */
+    .counter-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .counter-label {
+      font-size: 0.88rem;
+      color: var(--text-dim);
+      letter-spacing: 0.08em;
+      flex: 1;
+    }
+
+    .counter-control {
+      display: flex;
+      align-items: center;
+      gap: 0;
+      background: var(--surface-2);
+      border: 1px solid var(--border-light);
+      border-radius: 8px;
+      overflow: hidden;
+    }
+
+    .counter-btn {
+      background: none;
+      border: none;
+      color: var(--text-dim);
+      font-size: 1.3rem;
+      width: 40px;
+      height: 40px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background var(--transition), color var(--transition);
+      line-height: 1;
+      user-select: none;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .counter-btn:active {
+      background: var(--border);
+      color: var(--text);
+    }
+
+    .counter-value {
+      min-width: 36px;
+      text-align: center;
+      font-family: 'Cinzel', serif;
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: var(--text);
+    }
+
+    /* ─── TOAST NOTIFICATION ────────────────────────────────────── */
+    .toast {
+      position: fixed;
+      bottom: 90px;
+      left: 50%;
+      transform: translateX(-50%) translateY(20px);
+      background: var(--surface-2);
+      border: 1px solid var(--border-light);
+      border-radius: 8px;
+      padding: 10px 20px;
+      font-size: 0.85rem;
+      color: var(--text-dim);
+      letter-spacing: 0.05em;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.25s, transform 0.25s;
+      z-index: 100;
+      white-space: nowrap;
+    }
+
+    .toast.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+
+    /* ─── BOTTOM SAFE AREA ──────────────────────────────────────── */
+    .safe-bottom {
+      height: env(safe-area-inset-bottom, 16px);
+    }
+
+    /* ─── TABLET / DESKTOP ──────────────────────────────────────── */
+    @media (min-width: 600px) {
+      .app {
+        max-width: 560px;
+        padding-bottom: 48px;
+      }
+
+      .app-title {
+        font-size: 1.7rem;
+      }
+
+      .section {
+        margin: 24px 24px 0;
+      }
+    }
+
+    @media (min-width: 900px) {
+      body {
+        background: radial-gradient(ellipse at 50% 0%, #1c1f26 0%, #1e2228 60%);
+      }
+
+      .app {
+        max-width: 520px;
+        border-left: 1px solid var(--border);
+        border-right: 1px solid var(--border);
+        min-height: 100vh;
+      }
+    }
+
+    /* ─── PLACEHOLDER ───────────────────────────────────────────── */
+    .placeholder {
+      padding: 32px 18px;
+      text-align: center;
+      color: var(--text-muted);
+      font-size: 0.85rem;
+      letter-spacing: 0.1em;
+    }
+
+    /* ═══════════════════════════════════════════════════════════════
+       MODULO 2 — PUNTI FERITA
+    ═══════════════════════════════════════════════════════════════ */
+
+    /* ─── PIP GRID ──────────────────────────────────────────────── */
+    .pip-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      justify-content: center;
+      padding: 4px 0 8px;
+    }
+
+    .pip {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      border: 2px solid var(--red-dim);
+      background: transparent;
+      cursor: pointer;
+      transition:
+        background var(--transition),
+        border-color var(--transition),
+        transform 0.1s ease,
+        box-shadow var(--transition);
+      -webkit-tap-highlight-color: transparent;
+      position: relative;
+    }
+
+    .pip::after {
+      content: '';
+      position: absolute;
+      inset: 4px;
+      border-radius: 50%;
+      background: var(--red);
+      opacity: 0;
+      transform: scale(0.4);
+      transition: opacity 0.15s ease, transform 0.15s ease;
+    }
+
+    .pip.filled {
+      border-color: var(--red);
+      box-shadow: 0 0 10px var(--red-glow), inset 0 0 6px rgba(192,74,58,0.25);
+    }
+
+    .pip.filled::after {
+      opacity: 1;
+      transform: scale(1);
+    }
+
+    .pip:active {
+      transform: scale(0.88);
+    }
+
+    /* ─── PF STATUS LABEL ───────────────────────────────────────── */
+    .pf-status {
+      text-align: center;
+      font-size: 0.82rem;
+      letter-spacing: 0.1em;
+      color: var(--text-muted);
+      min-height: 1.2em;
+      transition: color var(--transition);
+      margin-bottom: 2px;
+    }
+
+    .pf-status.warning {
+      color: #c08030;
+    }
+
+    .pf-status.critical {
+      color: var(--red);
+      font-weight: 600;
+      animation: pulse-text 1.4s ease-in-out infinite;
+    }
+
+    @keyframes pulse-text {
+      0%, 100% { opacity: 1; }
+      50%       { opacity: 0.5; }
+    }
+
+    /* ─── PF COUNTER (current / max) ───────────────────────────── */
+    .pf-counter-row {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      margin: 10px 0 6px;
+    }
+
+    .pf-fraction {
+      font-family: 'Cinzel', serif;
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--red);
+      letter-spacing: 0.05em;
+    }
+
+    .pf-fraction-sep {
+      font-family: 'Cinzel', serif;
+      font-size: 1.1rem;
+      color: var(--text-muted);
+    }
+
+    .pf-fraction-max {
+      font-family: 'Cinzel', serif;
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: var(--text-dim);
+    }
+
+    /* ─── MAX SETTER ────────────────────────────────────────────── */
+    .max-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      padding-top: 4px;
+    }
+
+    .max-label {
+      font-size: 0.82rem;
+      color: var(--text-muted);
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+    }
+
+    .max-control {
+      display: flex;
+      align-items: center;
+      gap: 0;
+      background: var(--surface-2);
+      border: 1px solid var(--border-light);
+      border-radius: 8px;
+      overflow: hidden;
+    }
+
+    .max-btn {
+      background: none;
+      border: none;
+      color: var(--text-muted);
+      font-size: 1.1rem;
+      width: 34px;
+      height: 34px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background var(--transition), color var(--transition);
+      user-select: none;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .max-btn:active {
+      background: var(--border);
+      color: var(--text);
+    }
+
+    .max-value {
+      min-width: 30px;
+      text-align: center;
+      font-family: 'Cinzel', serif;
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--text-dim);
+    }
+
+    /* ─── DANNO BUTTONS ─────────────────────────────────────────── */
+    .damage-row {
+      display: flex;
+      gap: 10px;
+      margin-top: 16px;
+    }
+
+    .dmg-btn {
+      flex: 1;
+      background: var(--surface-2);
+      border: 1px solid var(--red-dim);
+      border-radius: var(--radius-sm);
+      color: var(--red);
+      font-family: 'Cinzel', serif;
+      font-size: 0.82rem;
+      font-weight: 600;
+      letter-spacing: 0.12em;
+      padding: 11px 6px;
+      cursor: pointer;
+      text-align: center;
+      transition:
+        background var(--transition),
+        border-color var(--transition),
+        color var(--transition),
+        transform 0.1s ease;
+      user-select: none;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .dmg-btn span {
+      display: block;
+      font-size: 1.1rem;
+      margin-bottom: 2px;
+    }
+
+    .dmg-btn small {
+      display: block;
+      font-family: 'Crimson Pro', serif;
+      font-size: 0.72rem;
+      color: var(--text-muted);
+      letter-spacing: 0.08em;
+      font-weight: 400;
+      margin-top: 1px;
+    }
+
+    .dmg-btn:active {
+      background: var(--red-dim);
+      border-color: var(--red);
+      color: #e8907a;
+      transform: scale(0.96);
+    }
+
+    /* ─── RESET BTN ─────────────────────────────────────────────── */
+    .reset-link {
+      display: block;
+      text-align: center;
+      margin-top: 14px;
+      font-size: 0.78rem;
+      color: var(--text-muted);
+      letter-spacing: 0.1em;
+      cursor: pointer;
+      text-transform: uppercase;
+      text-decoration: none;
+      transition: color var(--transition);
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .reset-link:active { color: var(--text-dim); }
+  
+  /* ═══════════════════════════════════════════════════════════════
+     MODULO 3 — STRESS
+  ═══════════════════════════════════════════════════════════════ */
+
+  /* Pip stress (colore blu, stessa struttura dei PF) */
+  .pip.stress {
+    border-color: var(--blue-dim);
+  }
+  .pip.stress::after {
+    background: var(--blue);
+  }
+  .pip.stress.filled {
+    border-color: var(--blue);
+    box-shadow: 0 0 10px var(--blue-glow), inset 0 0 6px rgba(58,122,191,0.25);
+  }
+
+  /* Banner vulnerabile */
+  .vulnerable-banner {
+    display: none;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    background: rgba(58,122,191,0.10);
+    border: 1px solid var(--blue-dim);
+    border-radius: var(--radius-sm);
+    padding: 12px 16px;
+    margin-bottom: 14px;
+    animation: banner-in 0.3s ease;
+  }
+
+  .vulnerable-banner.visible {
+    display: flex;
+  }
+
+  @keyframes banner-in {
+    from { opacity: 0; transform: translateY(-6px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  .vulnerable-icon {
+    font-size: 1.3rem;
+    flex-shrink: 0;
+  }
+
+  .vulnerable-text {
+    flex: 1;
+  }
+
+  .vulnerable-text strong {
+    display: block;
+    font-family: 'Cinzel', serif;
+    font-size: 0.8rem;
+    font-weight: 700;
+    letter-spacing: 0.15em;
+    color: var(--blue);
+    text-transform: uppercase;
+  }
+
+  .vulnerable-text span {
+    display: block;
+    font-size: 0.82rem;
+    color: var(--text-dim);
+    margin-top: 1px;
+  }
+
+  /* Stress fraction (blu) */
+  .stress-fraction {
+    font-family: 'Cinzel', serif;
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--blue);
+    letter-spacing: 0.05em;
+  }
+
+  .stress-fraction-max {
+    font-family: 'Cinzel', serif;
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--text-dim);
+  }
+
+  /* Bottoni stress +/- rapidi */
+  .stress-quick-row {
+    display: flex;
+    gap: 10px;
+    margin-top: 4px;
+  }
+
+  .stress-quick-btn {
+    flex: 1;
+    background: var(--surface-2);
+    border: 1px solid var(--blue-dim);
+    border-radius: var(--radius-sm);
+    color: var(--blue);
+    font-family: 'Cinzel', serif;
+    font-size: 1rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    padding: 10px 6px;
+    cursor: pointer;
+    text-align: center;
+    transition: background var(--transition), border-color var(--transition), transform 0.1s ease;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .stress-quick-btn small {
+    display: block;
+    font-family: 'Crimson Pro', serif;
+    font-size: 0.72rem;
+    color: var(--text-muted);
+    letter-spacing: 0.08em;
+    font-weight: 400;
+    margin-top: 1px;
+  }
+
+  .stress-quick-btn:active {
+    background: var(--blue-dim);
+    border-color: var(--blue);
+    transform: scale(0.96);
+  }
+
+
+  /* ═══════════════════════════════════════════════════════════════
+     MODULO 4 — TESORO
+  ═══════════════════════════════════════════════════════════════ */
+
+  .oro-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+
+  .oro-tile {
+    background: var(--surface-2);
+    border: 1px solid var(--border-light);
+    border-radius: var(--radius-sm);
+    padding: 14px 12px 12px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    position: relative;
+    overflow: hidden;
+    transition: border-color var(--transition);
+  }
+
+  .oro-tile::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, var(--gold-dim), transparent);
+    opacity: 0.6;
+  }
+
+  .oro-tile-icon {
+    font-size: 1.4rem;
+    line-height: 1;
+    filter: sepia(0.4) brightness(1.1);
+  }
+
+  .oro-tile-label {
+    font-family: 'Cinzel', serif;
+    font-size: 0.68rem;
+    font-weight: 600;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+  }
+
+  .oro-tile-value {
+    font-family: 'Cinzel', serif;
+    font-size: 1.6rem;
+    font-weight: 700;
+    color: var(--gold);
+    line-height: 1;
+    min-width: 2ch;
+    text-align: center;
+  }
+
+  .oro-tile-controls {
+    display: flex;
+    align-items: center;
+    gap: 0;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 7px;
+    overflow: hidden;
+    margin-top: 2px;
+  }
+
+  .oro-btn {
+    background: none;
+    border: none;
+    color: var(--gold-dim);
+    font-size: 1.1rem;
+    width: 34px;
+    height: 34px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background var(--transition), color var(--transition);
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .oro-btn:active {
+    background: var(--border);
+    color: var(--gold);
+  }
+
+  /* Conversion hint */
+  .oro-hint {
+    text-align: center;
+    font-size: 0.76rem;
+    color: var(--text-muted);
+    letter-spacing: 0.06em;
+    font-style: italic;
+    line-height: 1.4;
+    padding: 2px 0 4px;
+  }
+
+  /* Conversion flash */
+  @keyframes flash-gold {
+    0%   { background: rgba(201,168,76,0.18); }
+    100% { background: transparent; }
+  }
+
+  .oro-tile.flash {
+    animation: flash-gold 0.5s ease-out;
+  }
+
+  /* Conversion banner */
+  .oro-convert-banner {
+    display: none;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    background: rgba(201,168,76,0.08);
+    border: 1px solid var(--gold-dim);
+    border-radius: var(--radius-sm);
+    padding: 10px 14px;
+    margin-bottom: 14px;
+    font-size: 0.82rem;
+    color: var(--gold);
+    letter-spacing: 0.04em;
+    animation: banner-in 0.3s ease;
+  }
+
+  .oro-convert-banner.visible {
+    display: flex;
+  }
+
+</style>
+</head>
+<body>
+
+<div class="app">
+
+  <!-- HEADER -->
+  <header class="app-header">
+    <div class="app-title">Daggerheart</div>
+    <div class="app-subtitle">Character Tracker</div>
+  </header>
+
+  <!-- NOME PERSONAGGIO -->
+  <div class="char-name-wrap">
+    <input
+      class="char-name-input"
+      id="charName"
+      type="text"
+      maxlength="40"
+      placeholder="Nome del personaggio"
+      autocomplete="off"
+      spellcheck="false"
+    />
+  </div>
+
+  <!-- SEZIONE PF -->
+  <section class="section" id="section-pf">
+    <div class="section-header">
+      <span class="section-title">Punti Ferita</span>
+      <div class="pf-counter-row" style="margin:0;gap:4px;">
+        <span class="pf-fraction" id="pfCurrent">0</span>
+        <span class="pf-fraction-sep">/</span>
+        <span class="pf-fraction-max" id="pfMaxDisplay">6</span>
+      </div>
+    </div>
+    <div class="section-body">
+      <div class="pf-status" id="pfStatus"></div>
+      <div class="pip-grid" id="pfPips"></div>
+      <div class="divider"></div>
+      <div class="max-row">
+        <span class="max-label">Massimo PF</span>
+        <div class="max-control">
+          <button class="max-btn" id="pfMaxDec">&#8722;</button>
+          <span class="max-value" id="pfMaxValue">6</span>
+          <button class="max-btn" id="pfMaxInc">+</button>
+        </div>
+      </div>
+      <div class="divider"></div>
+      <div class="damage-row">
+        <button class="dmg-btn" id="dmg1"><span>+1</span><small>Ferita minore</small></button>
+        <button class="dmg-btn" id="dmg2"><span>+2</span><small>Ferita grave</small></button>
+        <button class="dmg-btn" id="dmg3"><span>+3</span><small>Ferita critica</small></button>
+      </div>
+      <a class="reset-link" id="pfReset">&#8635; Azzera PF</a>
+    </div>
+  </section>
+
+  <!-- SEZIONE STRESS -->
+  <section class="section" id="section-stress">
+    <div class="section-header">
+      <span class="section-title">Stress</span>
+      <div class="pf-counter-row" style="margin:0;gap:4px;">
+        <span class="stress-fraction" id="stressCurrent">0</span>
+        <span class="pf-fraction-sep">/</span>
+        <span class="stress-fraction-max" id="stressMaxDisplay">6</span>
+      </div>
+    </div>
+    <div class="section-body">
+
+      <!-- Banner vulnerabile -->
+      <div class="vulnerable-banner" id="vulnerableBanner">
+        <span class="vulnerable-icon">&#9888;</span>
+        <div class="vulnerable-text">
+          <strong>Vulnerabile</strong>
+          <span>Sei al massimo dello stress — sei vulnerabile.</span>
+        </div>
+      </div>
+
+      <!-- Pip grid stress -->
+      <div class="pip-grid" id="stressPips"></div>
+
+      <div class="divider"></div>
+
+      <!-- Max setter -->
+      <div class="max-row">
+        <span class="max-label">Massimo Stress</span>
+        <div class="max-control">
+          <button class="max-btn" id="stressMaxDec">&#8722;</button>
+          <span class="max-value" id="stressMaxValue">6</span>
+          <button class="max-btn" id="stressMaxInc">+</button>
+        </div>
+      </div>
+
+      <div class="divider"></div>
+
+      <!-- Bottoni rapidi +1 / -1 -->
+      <div class="stress-quick-row">
+        <button class="stress-quick-btn" id="stressDec"><span>&#8722;1</span><small>Riduci stress</small></button>
+        <button class="stress-quick-btn" id="stressInc"><span>+1</span><small>Aggiungi stress</small></button>
+      </div>
+
+      <!-- Reset -->
+      <a class="reset-link" id="stressReset">&#8635; Azzera Stress</a>
+
+    </div>
+  </section>
+
+  <!-- SEZIONE ORO -->
+  <section class="section" id="section-oro">
+    <div class="section-header">
+      <span class="section-title">Tesoro</span>
+      <span style="font-size:0.75rem;color:var(--gold-dim);letter-spacing:0.1em;">10:1</span>
+    </div>
+    <div class="section-body">
+
+      <!-- Banner conversione automatica -->
+      <div class="oro-convert-banner" id="convertBanner">
+        <span>&#9654;</span>
+        <span id="convertMsg"></span>
+      </div>
+
+      <!-- Griglia 2x2 -->
+      <div class="oro-grid">
+
+        <!-- MONETE -->
+        <div class="oro-tile" id="tile-monete">
+          <span class="oro-tile-label">Monete</span>
+          <span class="oro-tile-value" id="oroMonete">0</span>
+          <div class="oro-tile-controls">
+            <button class="oro-btn" id="moneteDec">&#8722;</button>
+            <button class="oro-btn" id="moneteInc">+</button>
+          </div>
+        </div>
+
+        <!-- MANCIATE -->
+        <div class="oro-tile" id="tile-manciate">
+          <span class="oro-tile-label">Manciate</span>
+          <span class="oro-tile-value" id="oroManciate">0</span>
+          <div class="oro-tile-controls">
+            <button class="oro-btn" id="manciateDec">&#8722;</button>
+            <button class="oro-btn" id="manciateInc">+</button>
+          </div>
+        </div>
+
+        <!-- SACCHI -->
+        <div class="oro-tile" id="tile-sacchi">
+          <span class="oro-tile-label">Sacchi</span>
+          <span class="oro-tile-value" id="oroSacchi">0</span>
+          <div class="oro-tile-controls">
+            <button class="oro-btn" id="sacchiDec">&#8722;</button>
+            <button class="oro-btn" id="sacchiInc">+</button>
+          </div>
+        </div>
+
+        <!-- CASSE -->
+        <div class="oro-tile" id="tile-casse">
+          <span class="oro-tile-label">Casse</span>
+          <span class="oro-tile-value" id="oroCasse">0</span>
+          <div class="oro-tile-controls">
+            <button class="oro-btn" id="casseDec">&#8722;</button>
+            <button class="oro-btn" id="casseInc">+</button>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="divider"></div>
+      <p class="oro-hint">10 monete = 1 manciata &nbsp;&bull;&nbsp; 10 manciate = 1 sacco &nbsp;&bull;&nbsp; 10 sacchi = 1 cassa<br>Le conversioni avvengono in automatico.</p>
+      <a class="reset-link" id="oroReset">&#8635; Azzera tutto il tesoro</a>
+
+    </div>
+  </section>
+
+  <div class="safe-bottom"></div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<script>
+  /* ─── STORAGE MANAGER ──────────────────────────────────────────
+     Centralizza tutto il salvataggio su localStorage.
+     Ogni modulo successivo userà queste funzioni.
+  ──────────────────────────────────────────────────────────────── */
+  const STORAGE_KEY = 'daggerheart_v1';
+
+  const defaultState = {
+    charName: '',
+    pf:       { max: 6,  current: 0 },
+    stress:   { max: 6,  current: 0 },
+    oro:      { monete: 0, manciate: 0, sacchi: 0, casse: 0 }
+  };
+
+  function loadState() {
+    try {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if (!raw) return structuredClone(defaultState);
+      return Object.assign(structuredClone(defaultState), JSON.parse(raw));
+    } catch {
+      return structuredClone(defaultState);
+    }
+  }
+
+  function saveState(state) {
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    } catch (e) {
+      showToast('Impossibile salvare i dati.');
+    }
+  }
+
+  /* ─── TOAST ─────────────────────────────────────────────────── */
+  let toastTimer = null;
+  function showToast(msg, duration = 2200) {
+    const el = document.getElementById('toast');
+    el.textContent = msg;
+    el.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => el.classList.remove('show'), duration);
+  }
+
+  /* ─── INIT ──────────────────────────────────────────────────── */
+  const state = loadState();
+
+  // Nome personaggio
+  const charNameEl = document.getElementById('charName');
+  charNameEl.value = state.charName;
+  charNameEl.addEventListener('input', () => {
+    state.charName = charNameEl.value;
+    saveState(state);
+  });
+
+  // Espone globalmente per i moduli successivi
+  window.DH = { state, saveState, showToast, loadState };
+
+  /* ═══════════════════════════════════════════════════════════════
+     MODULO 2 — PUNTI FERITA
+  ═══════════════════════════════════════════════════════════════ */
+  (function initPF() {
+    const PF_MIN = 1;
+    const PF_MAX_LIMIT = 20;
+
+    const pipsEl       = document.getElementById('pfPips');
+    const statusEl     = document.getElementById('pfStatus');
+    const currentEl    = document.getElementById('pfCurrent');
+    const maxDisplayEl = document.getElementById('pfMaxDisplay');
+    const maxValueEl   = document.getElementById('pfMaxValue');
+
+    function render() {
+      const { max, current } = state.pf;
+      currentEl.textContent    = current;
+      maxDisplayEl.textContent = max;
+      maxValueEl.textContent   = max;
+
+      const pct = current / max;
+      if (current === 0) {
+        statusEl.textContent = '';
+        statusEl.className   = 'pf-status';
+      } else if (pct < 0.5) {
+        statusEl.textContent = 'Lievemente ferito';
+        statusEl.className   = 'pf-status';
+      } else if (pct < 1) {
+        statusEl.textContent = 'Gravemente ferito';
+        statusEl.className   = 'pf-status warning';
+      } else {
+        statusEl.textContent = '\u26a0 In fin di vita';
+        statusEl.className   = 'pf-status critical';
+      }
+
+      pipsEl.innerHTML = '';
+      for (let i = 1; i <= max; i++) {
+        const pip = document.createElement('button');
+        pip.className = 'pip' + (i <= current ? ' filled' : '');
+        pip.setAttribute('aria-label', 'PF ' + i);
+        pip.addEventListener('click', () => togglePip(i));
+        pipsEl.appendChild(pip);
+      }
+    }
+
+    function togglePip(index) {
+      if (index === state.pf.current) {
+        state.pf.current = index - 1;
+      } else {
+        state.pf.current = Math.min(index, state.pf.max);
+      }
+      saveState(state);
+      render();
+    }
+
+    function applyDamage(amount) {
+      const prev = state.pf.current;
+      state.pf.current = Math.min(state.pf.current + amount, state.pf.max);
+      saveState(state);
+      render();
+      if (state.pf.current === state.pf.max && prev < state.pf.max) {
+        showToast('\u26a0 Sei in fin di vita!', 3200);
+      }
+    }
+
+    document.getElementById('pfMaxInc').addEventListener('click', () => {
+      if (state.pf.max >= PF_MAX_LIMIT) return;
+      state.pf.max++;
+      saveState(state);
+      render();
+    });
+
+    document.getElementById('pfMaxDec').addEventListener('click', () => {
+      if (state.pf.max <= PF_MIN) return;
+      state.pf.max--;
+      if (state.pf.current > state.pf.max) state.pf.current = state.pf.max;
+      saveState(state);
+      render();
+    });
+
+    document.getElementById('dmg1').addEventListener('click', () => applyDamage(1));
+    document.getElementById('dmg2').addEventListener('click', () => applyDamage(2));
+    document.getElementById('dmg3').addEventListener('click', () => applyDamage(3));
+
+    document.getElementById('pfReset').addEventListener('click', () => {
+      state.pf.current = 0;
+      saveState(state);
+      render();
+      showToast('PF azzerati');
+    });
+
+    render();
+  })();
+
+
+  /* ═══════════════════════════════════════════════════════════════
+     MODULO 3 — STRESS
+  ═══════════════════════════════════════════════════════════════ */
+  (function initStress() {
+    const S_MIN = 1;
+    const S_MAX_LIMIT = 20;
+
+    const pipsEl       = document.getElementById('stressPips');
+    const currentEl    = document.getElementById('stressCurrent');
+    const maxDisplayEl = document.getElementById('stressMaxDisplay');
+    const maxValueEl   = document.getElementById('stressMaxValue');
+    const bannerEl     = document.getElementById('vulnerableBanner');
+
+    function render() {
+      const { max, current } = state.stress;
+      currentEl.textContent    = current;
+      maxDisplayEl.textContent = max;
+      maxValueEl.textContent   = max;
+
+      // Banner vulnerabile
+      if (current >= max && max > 0) {
+        bannerEl.classList.add('visible');
+      } else {
+        bannerEl.classList.remove('visible');
+      }
+
+      // Pip grid
+      pipsEl.innerHTML = '';
+      for (let i = 1; i <= max; i++) {
+        const pip = document.createElement('button');
+        pip.className = 'pip stress' + (i <= current ? ' filled' : '');
+        pip.setAttribute('aria-label', 'Stress ' + i);
+        pip.addEventListener('click', () => togglePip(i));
+        pipsEl.appendChild(pip);
+      }
+    }
+
+    function togglePip(index) {
+      if (index === state.stress.current) {
+        state.stress.current = index - 1;
+      } else {
+        state.stress.current = Math.min(index, state.stress.max);
+      }
+      saveState(state);
+      render();
+      checkVulnerable();
+    }
+
+    function checkVulnerable() {
+      if (state.stress.current >= state.stress.max && state.stress.max > 0) {
+        showToast('\u26a0 Sei vulnerabile!', 3200);
+      }
+    }
+
+    function changeStress(delta) {
+      const prev = state.stress.current;
+      state.stress.current = Math.max(0, Math.min(state.stress.current + delta, state.stress.max));
+      saveState(state);
+      render();
+      if (delta > 0 && state.stress.current >= state.stress.max && prev < state.stress.max) {
+        showToast('\u26a0 Sei vulnerabile!', 3200);
+      }
+    }
+
+    document.getElementById('stressMaxInc').addEventListener('click', () => {
+      if (state.stress.max >= S_MAX_LIMIT) return;
+      state.stress.max++;
+      saveState(state);
+      render();
+    });
+
+    document.getElementById('stressMaxDec').addEventListener('click', () => {
+      if (state.stress.max <= S_MIN) return;
+      state.stress.max--;
+      if (state.stress.current > state.stress.max) state.stress.current = state.stress.max;
+      saveState(state);
+      render();
+    });
+
+    document.getElementById('stressInc').addEventListener('click', () => changeStress(1));
+    document.getElementById('stressDec').addEventListener('click', () => changeStress(-1));
+
+    document.getElementById('stressReset').addEventListener('click', () => {
+      state.stress.current = 0;
+      saveState(state);
+      render();
+      showToast('Stress azzerato');
+    });
+
+    render();
+  })();
+
+
+  /* ═══════════════════════════════════════════════════════════════
+     MODULO 4 — TESORO
+  ═══════════════════════════════════════════════════════════════ */
+  (function initOro() {
+
+    const ids = {
+      monete:   { val: 'oroMonete',   tile: 'tile-monete'   },
+      manciate: { val: 'oroManciate', tile: 'tile-manciate' },
+      sacchi:   { val: 'oroSacchi',   tile: 'tile-sacchi'   },
+      casse:    { val: 'oroCasse',    tile: 'tile-casse'     }
+    };
+
+    const labels = { monete: 'moneta', manciate: 'manciata', sacchi: 'sacco', casse: 'cassa' };
+    const chain  = ['monete', 'manciate', 'sacchi', 'casse'];
+
+    function render() {
+      const o = state.oro;
+      document.getElementById('oroMonete').textContent   = o.monete;
+      document.getElementById('oroManciate').textContent = o.manciate;
+      document.getElementById('oroSacchi').textContent   = o.sacchi;
+      document.getElementById('oroCasse').textContent    = o.casse;
+    }
+
+    /* Auto-conversione: se un livello raggiunge 10, sale al successivo */
+    function autoConvert() {
+      const o = state.oro;
+      let msg = '';
+
+      // Verso l'alto (accumulo)
+      if (o.monete >= 10) {
+        const promosse = Math.floor(o.monete / 10);
+        o.monete   -= promosse * 10;
+        o.manciate += promosse;
+        msg = promosse + ' manciata' + (promosse > 1 ? 'e' : '') + ' da ' + (promosse * 10) + ' monete';
+        flashTile('tile-monete');
+        flashTile('tile-manciate');
+      }
+      if (o.manciate >= 10) {
+        const promosse = Math.floor(o.manciate / 10);
+        o.manciate -= promosse * 10;
+        o.sacchi   += promosse;
+        msg = promosse + ' sacco' + (promosse > 1 ? 'i' : '') + ' da ' + (promosse * 10) + ' manciate';
+        flashTile('tile-manciate');
+        flashTile('tile-sacchi');
+      }
+      if (o.sacchi >= 10) {
+        const promosse = Math.floor(o.sacchi / 10);
+        o.sacchi -= promosse * 10;
+        o.casse  += promosse;
+        msg = promosse + ' cassa' + (promosse > 1 ? 'e' : '') + ' da ' + (promosse * 10) + ' sacchi';
+        flashTile('tile-sacchi');
+        flashTile('tile-casse');
+      }
+
+      // Verso il basso (spesa): se un livello va sotto 0, prende dal livello superiore
+      let changed = true;
+      while (changed) {
+        changed = false;
+        for (let i = 0; i < chain.length - 1; i++) {
+          const curr = chain[i];
+          const next = chain[i + 1];
+          if (o[curr] < 0 && o[next] > 0) {
+            o[next]--;
+            o[curr] += 10;
+            flashTile('tile-' + curr);
+            flashTile('tile-' + next);
+            changed = true;
+            msg = 'Convertito 1 ' + labels[next] + ' in 10 ' + labels[curr] + 'e';
+          }
+        }
+      }
+
+      // Se ancora negativo dopo la conversione, blocca a 0
+      chain.forEach(k => { if (o[k] < 0) o[k] = 0; });
+
+      if (msg) showConvertBanner(msg);
+    }
+
+    function flashTile(id) {
+      const el = document.getElementById(id);
+      if (!el) return;
+      el.classList.remove('flash');
+      void el.offsetWidth; // reflow
+      el.classList.add('flash');
+    }
+
+    let bannerTimer = null;
+    function showConvertBanner(msg) {
+      const banner = document.getElementById('convertBanner');
+      const msgEl  = document.getElementById('convertMsg');
+      msgEl.textContent = msg;
+      banner.classList.add('visible');
+      clearTimeout(bannerTimer);
+      bannerTimer = setTimeout(() => banner.classList.remove('visible'), 2800);
+    }
+
+    function change(key, delta) {
+      state.oro[key] += delta;
+      autoConvert();
+      saveState(state);
+      render();
+    }
+
+    // Bottoni
+    document.getElementById('moneteInc').addEventListener('click',   () => change('monete',   +1));
+    document.getElementById('moneteDec').addEventListener('click',   () => change('monete',   -1));
+    document.getElementById('manciateInc').addEventListener('click', () => change('manciate', +1));
+    document.getElementById('manciateDec').addEventListener('click', () => change('manciate', -1));
+    document.getElementById('sacchiInc').addEventListener('click',   () => change('sacchi',   +1));
+    document.getElementById('sacchiDec').addEventListener('click',   () => change('sacchi',   -1));
+    document.getElementById('casseInc').addEventListener('click',    () => change('casse',    +1));
+    document.getElementById('casseDec').addEventListener('click',    () => change('casse',    -1));
+
+    // Reset
+    document.getElementById('oroReset').addEventListener('click', () => {
+      state.oro = { monete: 0, manciate: 0, sacchi: 0, casse: 0 };
+      saveState(state);
+      render();
+      showToast('Tesoro azzerato');
+    });
+
+    render();
+  })();
+
+</script>
+
+</body>
+</html>
