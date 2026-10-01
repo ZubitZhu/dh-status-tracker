@@ -1248,6 +1248,37 @@
   .pg-choice:active { background: var(--border); }
   .pg-dot { width: 12px; height: 12px; border-radius: 50%; flex-shrink: 0; }
 
+  /* ═══════════════════════════════════════════════════════════════
+     MODULO CONDIZIONI
+  ═══════════════════════════════════════════════════════════════ */
+  .cond-row { display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; }
+  .cond-gm:empty { display: none; }
+  .cond-gm { margin-top: 12px; }
+
+  .cond-chip {
+    --c: var(--text-muted);
+    background: transparent;
+    border: 1px solid var(--border-light);
+    border-radius: 999px;
+    color: var(--text-muted);
+    font-family: 'Cinzel', serif;
+    font-size: 0.74rem;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    padding: 8px 14px;
+    cursor: pointer;
+    transition: background var(--transition), border-color var(--transition), color var(--transition);
+    -webkit-tap-highlight-color: transparent;
+  }
+  .cond-chip.on {
+    border-color: var(--c);
+    color: var(--c);
+    background: color-mix(in srgb, var(--c) 16%, transparent);
+    box-shadow: 0 0 8px color-mix(in srgb, var(--c) 30%, transparent);
+  }
+  .cond-chip:active { transform: scale(0.95); }
+  .cond-chip.readonly { cursor: default; pointer-events: none; font-size: 0.68rem; padding: 5px 11px; }
+
   .armor-hint {
     text-align: center;
     font-size: 0.78rem;
@@ -1382,6 +1413,17 @@
         </div>
       </div>
 
+    </div>
+  </section>
+
+  <!-- SEZIONE CONDIZIONI -->
+  <section class="section" id="section-cond">
+    <div class="section-header">
+      <span class="section-title">Condizioni</span>
+    </div>
+    <div class="section-body">
+      <div class="cond-row" id="condBase"></div>
+      <div class="cond-row cond-gm" id="condGm"></div>
     </div>
   </section>
 
@@ -1532,6 +1574,7 @@
     stress:    { max: 6, current: 0 },
     speranza:  { max: 6, current: 2 },
     armatura:  { score: 3, used: 0 },
+    condizioni: [],
     oro:      { monete: 0, manciate: 0, sacchi: 0, casse: 0 }
   };
 
@@ -1558,7 +1601,23 @@
     }
   }
 
+  // Vulnerabile automatico: scatta solo al passaggio dello Stress da/verso il massimo,
+  // così un Vulnerabile messo dal GM non sparisce se lo Stress non era pieno.
+  let wasStressFull = null;
+  const stressFull = () => state.stress.max > 0 && state.stress.current >= state.stress.max;
+  function autoVulnerable() {
+    const full = stressFull();
+    if (wasStressFull !== null && full !== wasStressFull) {
+      const has = state.condizioni.includes('Vulnerabile');
+      if (full && !has) state.condizioni.push('Vulnerabile');
+      if (!full && has) state.condizioni = state.condizioni.filter(c => c !== 'Vulnerabile');
+      if (DH.renderConds) DH.renderConds();
+    }
+    wasStressFull = full;
+  }
+
   function saveState(state) {
+    autoVulnerable();
     try {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
     } catch (e) {
@@ -1579,6 +1638,7 @@
 
   /* ─── INIT ──────────────────────────────────────────────────── */
   const state = loadState();
+  wasStressFull = stressFull();
 
   // Nome personaggio
   const charNameEl = document.getElementById('charName');
@@ -2054,6 +2114,55 @@
   })();
 
   /* ═══════════════════════════════════════════════════════════════
+     MODULO CONDIZIONI
+     Le 3 base le gestisce il giocatore; le altre le assegna il GM e qui
+     si vedono soltanto.
+  ═══════════════════════════════════════════════════════════════ */
+  (function initCondizioni() {
+    const BASE = [
+      ['Nascosto',    '#a78bfa'],
+      ['Trattenuto',  '#f97316'],
+      ['Vulnerabile', '#ef4444'],
+    ];
+    const baseEl = document.getElementById('condBase');
+    const gmEl   = document.getElementById('condGm');
+
+    function chip(name, color, on, readonly) {
+      const b = document.createElement('button');
+      b.className = 'cond-chip' + (on ? ' on' : '') + (readonly ? ' readonly' : '');
+      b.style.setProperty('--c', color);
+      b.textContent = name;
+      if (readonly) b.disabled = true;
+      return b;
+    }
+
+    function render() {
+      baseEl.innerHTML = '';
+      for (const [name, color] of BASE) {
+        const b = chip(name, color, state.condizioni.includes(name), false);
+        b.setAttribute('aria-pressed', state.condizioni.includes(name));
+        b.addEventListener('click', () => {
+          state.condizioni = state.condizioni.includes(name)
+            ? state.condizioni.filter(c => c !== name)
+            : [...state.condizioni, name];
+          saveState(state);
+          render();
+        });
+        baseEl.appendChild(b);
+      }
+      gmEl.innerHTML = '';
+      for (const name of state.condizioni) {
+        if (!BASE.some(([n]) => n === name)) gmEl.appendChild(chip(name, 'var(--gold)', true, true));
+      }
+    }
+
+    DH.renderConds = render;
+    DH.renders.push(render);
+    render();
+  })();
+
+
+  /* ═══════════════════════════════════════════════════════════════
      SINCRONIZZAZIONE CON IL COMBAT MANAGER (Firebase REST)
      Il link del GM porta ?p=<codice party>. Le modifiche locali partono
      subito; se si è offline restano "da inviare" (dh_dirty) e vengono
@@ -2079,6 +2188,7 @@
       hope:      s.speranza.current,
       maxHope:   s.speranza.max,
       armorUsed: s.armatura.used,
+      conditions: s.condizioni.join('|'),   // stringa: Firebase cancellerebbe un array vuoto
       oro:       { ...s.oro }
     };
   }
@@ -2097,11 +2207,13 @@
       if (r.hope != null)      state.speranza.current = r.hope;
       if (r.armorUsed != null) state.armatura.used = r.armorUsed;
       if (r.oro)               state.oro = { ...state.oro, ...r.oro };
+      if ('conditions' in r)   state.condizioni = (r.conditions || '').split('|').filter(Boolean);
     }
     state.pf.current       = Math.min(state.pf.current, state.pf.max);
     state.stress.current   = Math.min(state.stress.current, state.stress.max);
     state.speranza.current = Math.min(state.speranza.current, state.speranza.max);
     state.armatura.used    = Math.min(state.armatura.used, state.armatura.score);
+    wasStressFull = stressFull();   // un cambio arrivato da fuori non applica Vulnerabile da solo
     localStorage.setItem(STORAGE_KEY, JSON.stringify(state));   // niente push: il dato arriva da fuori
     renderAll();
   }
