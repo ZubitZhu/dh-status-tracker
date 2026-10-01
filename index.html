@@ -47,8 +47,8 @@
       background: var(--bg);
       color: var(--text);
       font-family: 'Crimson Pro', Georgia, serif;
-      font-size: 18px;
-      line-height: 1.5;
+      font-size: 16px;
+      line-height: 1.4;
       -webkit-font-smoothing: antialiased;
     }
 
@@ -57,7 +57,7 @@
       min-height: 100dvh;
       max-width: 480px;
       margin: 0 auto;
-      padding: 0 0 80px;
+      padding: 0 0 48px;
       display: flex;
       flex-direction: column;
       gap: 0;
@@ -65,7 +65,7 @@
 
     /* ─── HEADER ────────────────────────────────────────────────── */
     .app-header {
-      padding: 28px 24px 20px;
+      padding: 14px 20px 10px;
       text-align: center;
       border-bottom: 1px solid var(--border);
       position: relative;
@@ -98,7 +98,7 @@
 
     /* ─── CHAR NAME ─────────────────────────────────────────────── */
     .char-name-wrap {
-      padding: 16px 24px 0;
+      padding: 8px 20px 0;
     }
 
     .char-name-input {
@@ -128,7 +128,7 @@
 
     /* ─── SECTION CARD ──────────────────────────────────────────── */
     .section {
-      margin: 20px 16px 0;
+      margin: 12px 12px 0;
       background: var(--surface);
       border: 1px solid var(--border);
       border-radius: var(--radius);
@@ -140,7 +140,7 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
-      padding: 14px 18px 12px;
+      padding: 9px 14px 8px;
       border-bottom: 1px solid var(--border);
       background: var(--surface-2);
     }
@@ -155,14 +155,14 @@
     }
 
     .section-body {
-      padding: 20px 18px;
+      padding: 12px 14px;
     }
 
     /* ─── DIVIDER ───────────────────────────────────────────────── */
     .divider {
       height: 1px;
       background: var(--border);
-      margin: 16px 0;
+      margin: 12px 0;
     }
 
     /* ─── COUNTER CONTROL ───────────────────────────────────────── */
@@ -263,7 +263,7 @@
       }
 
       .section {
-        margin: 24px 24px 0;
+        margin: 16px 16px 0;
       }
     }
 
@@ -304,8 +304,8 @@
 
     /* Rombo base — ruotato 45deg, bordo netto */
     .pip {
-      width: 28px;
-      height: 28px;
+      width: 24px;
+      height: 24px;
       border-radius: 4px;
       border: 2px solid var(--red-dim);
       background: transparent;
@@ -382,7 +382,7 @@
       align-items: center;
       justify-content: center;
       gap: 6px;
-      margin: 10px 0 6px;
+      margin: 6px 0 4px;
     }
 
     .pf-fraction {
@@ -437,8 +437,8 @@
       border: none;
       color: var(--text-muted);
       font-size: 1.1rem;
-      width: 34px;
-      height: 34px;
+      width: 30px;
+      height: 30px;
       cursor: pointer;
       display: flex;
       align-items: center;
@@ -465,8 +465,8 @@
     /* ─── DANNO BUTTONS ─────────────────────────────────────────── */
     .damage-row {
       display: flex;
-      gap: 10px;
-      margin-top: 16px;
+      gap: 8px;
+      margin-top: 4px;
     }
 
     .dmg-btn {
@@ -479,7 +479,7 @@
       font-size: 0.82rem;
       font-weight: 600;
       letter-spacing: 0.12em;
-      padding: 11px 6px;
+      padding: 7px 6px;
       cursor: pointer;
       text-align: center;
       transition:
@@ -518,7 +518,7 @@
     .reset-link {
       display: block;
       text-align: center;
-      margin-top: 14px;
+      margin-top: 6px;
       font-size: 0.78rem;
       color: var(--text-muted);
       letter-spacing: 0.1em;
@@ -559,8 +559,8 @@
     background: rgba(58,122,191,0.10);
     border: 1px solid var(--blue-dim);
     border-radius: var(--radius-sm);
-    padding: 12px 16px;
-    margin-bottom: 14px;
+    padding: 8px 12px;
+    margin-bottom: 8px;
     animation: banner-in 0.3s ease;
   }
 
@@ -618,7 +618,7 @@
   /* Bottoni stress +/- rapidi */
   .stress-quick-row {
     display: flex;
-    gap: 10px;
+    gap: 8px;
     margin-top: 4px;
   }
 
@@ -632,7 +632,7 @@
     font-size: 1rem;
     font-weight: 700;
     letter-spacing: 0.1em;
-    padding: 10px 6px;
+    padding: 6px 6px;
     cursor: pointer;
     text-align: center;
     transition: background var(--transition), border-color var(--transition), transform 0.1s ease;
@@ -664,18 +664,18 @@
   .oro-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 12px;
+    gap: 8px;
   }
 
   .oro-tile {
     background: var(--surface-2);
     border: 1px solid var(--border-light);
     border-radius: var(--radius-sm);
-    padding: 14px 12px 12px;
+    padding: 8px 10px;
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 6px;
+    gap: 4px;
     position: relative;
     overflow: hidden;
     transition: border-color var(--transition);
@@ -707,7 +707,7 @@
 
   .oro-tile-value {
     font-family: 'Cinzel', serif;
-    font-size: 1.6rem;
+    font-size: 1.35rem;
     font-weight: 700;
     color: var(--gold);
     line-height: 1;
@@ -777,8 +777,8 @@
     background: rgba(201,168,76,0.08);
     border: 1px solid var(--gold-dim);
     border-radius: var(--radius-sm);
-    padding: 10px 14px;
-    margin-bottom: 14px;
+    padding: 8px 12px;
+    margin-bottom: 8px;
     font-size: 0.82rem;
     color: var(--gold);
     letter-spacing: 0.04em;
@@ -904,7 +904,7 @@
   ═══════════════════════════════════════════════════════════════ */
 
   .section-body.compact {
-    padding: 12px 14px;
+    padding: 10px 12px;
   }
 
   .vital-block {
@@ -936,7 +936,7 @@
   }
 
   .vital-controls {
-    margin-top: 8px;
+    margin-top: 4px;
     display: flex;
     flex-direction: column;
     gap: 6px;
@@ -944,13 +944,13 @@
 
   /* Pip compatti */
   .compact-pips {
-    gap: 10px;
-    padding: 2px 0 4px;
+    gap: 9px;
+    padding: 2px 0 2px;
   }
 
   .compact-pips .pip {
-    width: 26px;
-    height: 26px;
+    width: 22px;
+    height: 22px;
   }
 
   /* Fraction speranza (oro) */
@@ -1010,7 +1010,7 @@
     font-weight: 600;
     letter-spacing: 0.14em;
     text-transform: uppercase;
-    padding: 7px 12px;
+    padding: 6px 12px;
     cursor: pointer;
     width: 100%;
     transition: border-color var(--transition), color var(--transition), background var(--transition);
@@ -1024,7 +1024,7 @@
 
   /* Divider più stretto dentro vitals */
   .section-body.compact .divider {
-    margin: 10px 0;
+    margin: 8px 0;
   }
 
   /* ─── MODAL CICATRICE ─────────────────────────────────────────── */
@@ -1265,7 +1265,7 @@
     font-size: 0.74rem;
     font-weight: 600;
     letter-spacing: 0.08em;
-    padding: 8px 14px;
+    padding: 6px 12px;
     cursor: pointer;
     transition: background var(--transition), border-color var(--transition), color var(--transition);
     -webkit-tap-highlight-color: transparent;
@@ -1279,12 +1279,31 @@
   .cond-chip:active { transform: scale(0.95); }
   .cond-chip.readonly { cursor: default; pointer-events: none; font-size: 0.68rem; padding: 5px 11px; }
 
+  /* ═══════════════════════════════════════════════════════════════
+     TESORO COLLASSABILE + FAMIGLIO
+  ═══════════════════════════════════════════════════════════════ */
+  .section-header.toggle { cursor: pointer; user-select: none; -webkit-tap-highlight-color: transparent; }
+  .section-chevron { font-size: 0.75rem; color: var(--text-muted); margin-left: 8px; transition: transform var(--transition); }
+  .section.collapsed .section-header { border-bottom: none; }
+  .section.collapsed .section-body { display: none; }
+  .section.collapsed .section-chevron { transform: rotate(-90deg); }
+
+  .fam-title { display: flex; align-items: center; gap: 8px; }
+  .fam-diamond { width: 8px; height: 8px; transform: rotate(45deg); background: var(--blue); flex-shrink: 0; }
+  .fam-fraction { font-family: 'Cinzel', serif; font-size: 1.15rem; font-weight: 700; color: var(--blue); }
+  .section-body.fam-body { padding: 8px 12px; }
+  .fam-row { display: flex; align-items: center; gap: 8px; }
+  .fam-row .pip-grid { flex: 1; padding: 0; }
+  .fam-btn { border: 1px solid var(--border-light); border-radius: 8px; background: var(--surface-2); flex-shrink: 0; }
+  .vulnerable-banner.fam-banner { background: rgba(255,124,92,0.10); border-color: var(--red-dim); }
+  .fam-banner .vulnerable-text strong { color: var(--red); }
+
   .armor-hint {
     text-align: center;
     font-size: 0.78rem;
     color: var(--text-muted);
     letter-spacing: 0.06em;
-    margin-top: 12px;
+    margin-top: 8px;
   }
 
 </style>
@@ -1454,9 +1473,9 @@
 
   <!-- SEZIONE ORO -->
   <section class="section" id="section-oro">
-    <div class="section-header">
+    <div class="section-header toggle" id="oroToggle" role="button" aria-controls="oroBody">
       <span class="section-title">Tesoro</span>
-      <span style="font-size:0.75rem;color:var(--gold-dim);letter-spacing:0.1em;">10:1</span>
+      <span style="font-size:0.75rem;color:var(--gold-dim);letter-spacing:0.1em;">10:1<span class="section-chevron">&#9660;</span></span>
     </div>
     <div class="section-body">
 
@@ -1518,6 +1537,32 @@
     </div>
   </section>
 
+  <!-- SEZIONE FAMIGLIO (solo se il GM ne ha abbinato uno al PG) -->
+  <section class="section" id="section-fam" hidden>
+    <div class="section-header">
+      <span class="section-title fam-title"><span class="fam-diamond"></span><span id="famName">Famiglio</span></span>
+      <div class="vital-fraction">
+        <span class="fam-fraction" id="famCurrent">0</span>
+        <span class="pf-fraction-sep">/</span>
+        <span class="stress-fraction-max" id="famMax">3</span>
+      </div>
+    </div>
+    <div class="section-body fam-body">
+      <div class="vulnerable-banner fam-banner" id="famBanner">
+        <span class="vulnerable-icon">&#10140;</span>
+        <div class="vulnerable-text">
+          <strong id="famFleeMsg">Fugge!</strong>
+          <span>Stress al massimo: tornerà più tardi.</span>
+        </div>
+      </div>
+      <div class="fam-row">
+        <button class="max-btn fam-btn" id="famDec" aria-label="Togli uno Stress al famiglio">&#8722;</button>
+        <div class="pip-grid compact-pips" id="famPips"></div>
+        <button class="max-btn fam-btn" id="famInc" aria-label="Segna uno Stress al famiglio">+</button>
+      </div>
+    </div>
+  </section>
+
 <!-- DEATH MOVE MODAL -->
 <div class="death-overlay" id="deathOverlay">
   <div class="death-modal" role="dialog" aria-modal="true" aria-labelledby="deathTitle">
@@ -1575,7 +1620,8 @@
     speranza:  { max: 6, current: 2 },
     armatura:  { score: 3, used: 0 },
     condizioni: [],
-    oro:      { monete: 0, manciate: 0, sacchi: 0, casse: 0 }
+    oro:      { monete: 0, manciate: 0, sacchi: 0, casse: 0 },
+    famiglio: { name: '', max: 3, current: 0 }   // il nome lo assegna il GM
   };
 
   function loadState() {
@@ -1972,6 +2018,20 @@
     document.getElementById('casseInc').addEventListener('click',    () => change('casse',    +1));
     document.getElementById('casseDec').addEventListener('click',    () => change('casse',    -1));
 
+    // Sezione chiudibile: chiusa di default, la scelta resta su questo telefono
+    const section = document.getElementById('section-oro');
+    const toggle  = document.getElementById('oroToggle');
+    const setOpen = open => {
+      section.classList.toggle('collapsed', !open);
+      toggle.setAttribute('aria-expanded', open);
+    };
+    setOpen(localStorage.getItem('dh_oro_open') === '1');
+    toggle.addEventListener('click', () => {
+      const open = section.classList.contains('collapsed');
+      setOpen(open);
+      localStorage.setItem('dh_oro_open', open ? '1' : '0');
+    });
+
     // Reset
     document.getElementById('oroReset').addEventListener('click', () => {
       state.oro = { monete: 0, manciate: 0, sacchi: 0, casse: 0 };
@@ -1979,6 +2039,51 @@
       render();
       showToast('Tesoro azzerato');
     });
+
+    DH.renders.push(render);
+    render();
+  })();
+
+
+  /* ═══════════════════════════════════════════════════════════════
+     MODULO FAMIGLIO
+     Solo Stress: al massimo il famiglio fugge (non muore) e torna più tardi.
+     Compare solo se il GM ne ha abbinato uno al PG; il massimo lo decide lui.
+  ═══════════════════════════════════════════════════════════════ */
+  (function initFamiglio() {
+    const f = state.famiglio;
+    const sectionEl = document.getElementById('section-fam');
+    const pipsEl    = document.getElementById('famPips');
+    const bannerEl  = document.getElementById('famBanner');
+
+    function render() {
+      sectionEl.hidden = !f.name;
+      if (!f.name) return;
+      document.getElementById('famName').textContent    = f.name;
+      document.getElementById('famCurrent').textContent = f.current;
+      document.getElementById('famMax').textContent     = f.max;
+      document.getElementById('famFleeMsg').textContent = f.name + ' fugge!';
+      bannerEl.classList.toggle('visible', f.max > 0 && f.current >= f.max);
+      pipsEl.innerHTML = '';
+      for (let i = 1; i <= f.max; i++) {
+        const pip = document.createElement('button');
+        pip.className = 'pip stress' + (i <= f.current ? ' filled' : '');
+        pip.setAttribute('aria-label', 'Stress famiglio ' + i);
+        pip.addEventListener('click', () => set(i === f.current ? i - 1 : i));
+        pipsEl.appendChild(pip);
+      }
+    }
+
+    function set(v) {
+      const prev = f.current;
+      f.current = Math.max(0, Math.min(v, f.max));
+      saveState(state);
+      render();
+      if (f.current >= f.max && prev < f.max) showToast(f.name + ' fugge!', 3200);
+    }
+
+    document.getElementById('famInc').addEventListener('click', () => set(f.current + 1));
+    document.getElementById('famDec').addEventListener('click', () => set(f.current - 1));
 
     DH.renders.push(render);
     render();
@@ -2189,9 +2294,14 @@
       maxHope:   s.speranza.max,
       armorUsed: s.armatura.used,
       conditions: s.condizioni.join('|'),   // stringa: Firebase cancellerebbe un array vuoto
-      oro:       { ...s.oro }
+      oro:       { ...s.oro },
+      // Solo con un famiglio: altrimenti il GM cancellerebbe il campo e si andrebbe in loop
+      ...(s.famiglio.name ? { famStress: s.famiglio.current } : {})
     };
   }
+
+  // Un record completo senza famName vuol dire "nessun famiglio"
+  const fullRecord = d => ({ famName: null, ...d });
 
   // gmOnly: con modifiche locali ancora da inviare si prendono solo i campi del GM,
   // altrimenti un evento in arrivo cancellerebbe il tap appena fatto.
@@ -2200,7 +2310,10 @@
     if (r.maxHp != null)      state.pf.max = r.maxHp;
     if (r.maxStress != null)  state.stress.max = r.maxStress;
     if (r.armorScore != null) state.armatura.score = r.armorScore;
+    if ('famName' in r)       state.famiglio.name = r.famName || '';
+    if (r.famMaxStress != null) state.famiglio.max = r.famMaxStress;
     if (!gmOnly) {
+      if (r.famStress != null) state.famiglio.current = r.famStress;
       if (r.maxHope != null)   state.speranza.max = r.maxHope;
       if (r.hpMarked != null)  state.pf.current = r.hpMarked;
       if (r.stress != null)    state.stress.current = r.stress;
@@ -2213,6 +2326,7 @@
     state.stress.current   = Math.min(state.stress.current, state.stress.max);
     state.speranza.current = Math.min(state.speranza.current, state.speranza.max);
     state.armatura.used    = Math.min(state.armatura.used, state.armatura.score);
+    state.famiglio.current = Math.min(state.famiglio.current, state.famiglio.max);
     wasStressFull = stressFull();   // un cambio arrivato da fuori non applica Vulnerabile da solo
     localStorage.setItem(STORAGE_KEY, JSON.stringify(state));   // niente push: il dato arriva da fuori
     renderAll();
@@ -2261,7 +2375,7 @@
       }
       const parts = path.split('/').filter(Boolean);
       if (parts.length > 1) return;                    // sotto-campi (es. oro/monete): non li scrive nessuno
-      const r = parts.length === 0 ? data : { [parts[0]]: data };
+      const r = parts.length === 0 ? fullRecord(data) : { [parts[0]]: data };
       applyRemote(r, !!localStorage.getItem('dh_dirty'));
     };
     es.addEventListener('put', onEvent);
@@ -2301,7 +2415,7 @@
         localStorage.setItem('dh_pg', id);
         overlay.classList.remove('visible');
         startLinked();
-        applyRemote(p, false);
+        applyRemote(fullRecord(p), false);
       });
       list.appendChild(b);
     }
