@@ -2375,7 +2375,8 @@
       }
       const parts = path.split('/').filter(Boolean);
       if (parts.length > 1) return;                    // sotto-campi (es. oro/monete): non li scrive nessuno
-      const r = parts.length === 0 ? fullRecord(data) : { [parts[0]]: data };
+      // Solo un "put" sulla radice è il record intero: un "patch" porta i soli campi cambiati
+      const r = parts.length > 0 ? { [parts[0]]: data } : e.type === 'put' ? fullRecord(data) : data;
       applyRemote(r, !!localStorage.getItem('dh_dirty'));
     };
     es.addEventListener('put', onEvent);
