@@ -4,6 +4,9 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
   <title>Daggerheart Tracker</title>
+  <link rel="manifest" href="manifest.json" />
+  <meta name="theme-color" content="#252830" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Crimson+Pro:ital,wght@0,300;0,400;0,600;1,300;1,400&display=swap" rel="stylesheet" />
 
@@ -1119,6 +1122,99 @@
     transform: scale(0.97);
   }
 
+  /* ═══════════════════════════════════════════════════════════════
+     MODULO ARMATURA
+  ═══════════════════════════════════════════════════════════════ */
+  .armor-body {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+  }
+
+  .armor-badge {
+    position: relative;
+    width: 96px;
+    flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .armor-badge svg {
+    width: 96px;
+    height: 108px;
+    display: block;
+  }
+
+  .armor-score {
+    position: absolute;
+    top: 26px;
+    left: 0;
+    right: 0;
+    text-align: center;
+    font-family: 'Cinzel', serif;
+    font-size: 2.1rem;
+    font-weight: 700;
+    color: var(--text);
+    line-height: 1;
+  }
+
+  .armor-label {
+    position: absolute;
+    top: 74px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--bg);
+    border: 1px solid var(--border-light);
+    border-radius: 6px;
+    padding: 1px 7px;
+    font-family: 'Cinzel', serif;
+    font-size: 0.6rem;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    color: var(--text);
+  }
+
+  .armor-grid {
+    flex: 1;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 10px 8px;
+    justify-items: center;
+  }
+
+  .shield {
+    background: none;
+    border: none;
+    padding: 0;
+    width: 34px;
+    height: 38px;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+    transition: transform 0.1s ease, opacity var(--transition);
+  }
+
+  .shield svg { width: 100%; height: 100%; display: block; }
+  .shield .body  { fill: var(--blue-dim); stroke: var(--gold); stroke-width: 2.5; }
+  .shield .crack { fill: none; stroke: var(--bg); stroke-width: 2.5; stroke-linejoin: round; display: none; }
+
+  .shield.used .body  { fill: #3d6fa0; }
+  .shield.used .crack { display: block; }
+
+  .shield.off { cursor: default; opacity: 0.3; pointer-events: none; }
+  .shield.off .body { fill: var(--surface-2); stroke: var(--blue-dim); stroke-width: 2; }
+
+  .shield:active { transform: scale(0.88); }
+
+  .armor-hint {
+    text-align: center;
+    font-size: 0.78rem;
+    color: var(--text-muted);
+    letter-spacing: 0.06em;
+    margin-top: 12px;
+  }
+
 </style>
 </head>
 <body>
@@ -1243,6 +1339,31 @@
     </div>
   </section>
 
+  <!-- SEZIONE ARMATURA -->
+  <section class="section" id="section-armor">
+    <div class="section-header">
+      <span class="section-title">Armatura</span>
+    </div>
+    <div class="section-body">
+      <div class="armor-body">
+        <div class="armor-badge">
+          <svg viewBox="0 0 96 108" aria-hidden="true">
+            <path d="M6 6 Q48 -2 90 6 V58 Q90 88 48 104 Q6 88 6 58 Z"
+                  fill="#2a3f63" stroke="#b8bec8" stroke-width="5"/>
+          </svg>
+          <span class="armor-score" id="armorScore">3</span>
+          <span class="armor-label">ARMATURA</span>
+          <div class="max-control" id="armorScoreCtl">
+            <button class="max-btn" id="armorScoreDec" aria-label="Riduci punteggio armatura">&#8722;</button>
+            <button class="max-btn" id="armorScoreInc" aria-label="Aumenta punteggio armatura">+</button>
+          </div>
+        </div>
+        <div class="armor-grid" id="armorGrid"></div>
+      </div>
+      <p class="armor-hint">Tocca uno scudo per usarlo, l'ultimo usato per ripararlo.</p>
+    </div>
+  </section>
+
   <!-- SEZIONE ORO -->
   <section class="section" id="section-oro">
     <div class="section-header">
@@ -1356,7 +1477,8 @@
     pf:        { max: 6, current: 0 },
     stress:    { max: 6, current: 0 },
     speranza:  { max: 6, current: 2 },
-    oro:       { monete: 0, manciate: 0, sacchi: 0, casse: 0 }
+    armatura:  { score: 3, used: 0 },
+    oro:      { monete: 0, manciate: 0, sacchi: 0, casse: 0 }
   };
 
   function loadState() {
@@ -1818,6 +1940,60 @@
 
     render();
   })();
+
+
+  /* ═══════════════════════════════════════════════════════════════
+     MODULO ARMATURA
+  ═══════════════════════════════════════════════════════════════ */
+  (function initArmor() {
+    const MAX_SLOTS = 12;
+    const SHIELD_SVG =
+      '<svg viewBox="0 0 34 38" aria-hidden="true">' +
+      '<path class="body" d="M3 3 Q17 0 31 3 V20 Q31 30 17 36 Q3 30 3 20 Z"/>' +
+      '<path class="crack" d="M18 3 L14 13 L19 18 L13 27 L16 35"/>' +
+      '</svg>';
+
+    const gridEl  = document.getElementById('armorGrid');
+    const scoreEl = document.getElementById('armorScore');
+
+    function render() {
+      const { score, used } = state.armatura;
+      scoreEl.textContent = score;
+      gridEl.innerHTML = '';
+      for (let i = 1; i <= MAX_SLOTS; i++) {
+        const b = document.createElement('button');
+        b.className = 'shield ' + (i > score ? 'off' : i <= used ? 'used' : 'free');
+        b.innerHTML = SHIELD_SVG;
+        if (i <= score) {
+          b.setAttribute('aria-label', 'Slot armatura ' + i + (i <= used ? ' (usato)' : ''));
+          b.addEventListener('click', () => {
+            state.armatura.used = (i === state.armatura.used) ? i - 1 : i;
+            saveState(state);
+            render();
+            if (state.armatura.used === state.armatura.score) showToast('Armatura esaurita');
+          });
+        } else {
+          b.disabled = true;
+        }
+        gridEl.appendChild(b);
+      }
+    }
+
+    function setScore(delta) {
+      const a = state.armatura;
+      a.score = Math.max(0, Math.min(MAX_SLOTS, a.score + delta));
+      a.used  = Math.min(a.used, a.score);
+      saveState(state);
+      render();
+    }
+
+    document.getElementById('armorScoreInc').addEventListener('click', () => setScore(+1));
+    document.getElementById('armorScoreDec').addEventListener('click', () => setScore(-1));
+
+    render();
+  })();
+
+  if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js');
 
 </script>
 
