@@ -11,8 +11,11 @@ self.addEventListener('activate', e => e.waitUntil(self.clients.claim()));
 
 self.addEventListener('fetch', e => {
   if (e.request.method !== 'GET' || !e.request.url.startsWith(self.location.origin)) return;
+  // no-cache: chiede sempre al server se il file è cambiato. Senza, la cache HTTP di
+  // GitHub Pages (max-age=600) serviva la versione vecchia per 10 minuti dopo un push.
+  // Si passa l'URL e non la Request: una richiesta di navigazione con opzioni darebbe errore.
   e.respondWith(
-    fetch(e.request)
+    fetch(e.request.url, { cache: 'no-cache' })
       .then(r => {
         const copy = r.clone();
         caches.open(CACHE).then(c => c.put(e.request, copy));
