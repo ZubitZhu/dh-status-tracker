@@ -1207,6 +1207,47 @@
 
   .shield:active { transform: scale(0.88); }
 
+  /* ═══════════════════════════════════════════════════════════════
+     SINCRONIZZAZIONE
+  ═══════════════════════════════════════════════════════════════ */
+  .sync-bar {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    margin-top: 6px;
+    font-size: 0.78rem;
+    letter-spacing: 0.08em;
+    color: var(--text-muted);
+  }
+  .sync-bar[hidden] { display: none; }
+  .sync-bar.online #syncStatus { color: #7fd69a; }
+  .sync-bar a { cursor: pointer; text-decoration: underline; -webkit-tap-highlight-color: transparent; }
+
+  /* Collegato al GM: i massimi li decide lui */
+  .linked #section-vitals .max-row,
+  .linked #armorScoreCtl { display: none; }
+
+  .pg-list { display: flex; flex-direction: column; gap: 10px; }
+  .pg-choice {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background: var(--surface-2);
+    border: 1px solid var(--border-light);
+    border-radius: var(--radius-sm);
+    color: var(--text);
+    font-family: 'Cinzel', serif;
+    font-size: 0.95rem;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    padding: 12px 14px;
+    cursor: pointer;
+    text-align: left;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .pg-choice:active { background: var(--border); }
+  .pg-dot { width: 12px; height: 12px; border-radius: 50%; flex-shrink: 0; }
+
   .armor-hint {
     text-align: center;
     font-size: 0.78rem;
@@ -1238,6 +1279,11 @@
       autocomplete="off"
       spellcheck="false"
     />
+    <div class="sync-bar" id="syncBar" hidden>
+      <span id="syncStatus">… collegamento</span>
+      <span>&bull;</span>
+      <a id="changePg">Cambia PG</a>
+    </div>
   </div>
 
   <!-- SEZIONE UNIFICATA: PF + STRESS + SPERANZA -->
@@ -1462,6 +1508,14 @@
   <div class="safe-bottom"></div>
 </div>
 
+<!-- SCELTA PG -->
+<div class="cicatrice-overlay" id="pgOverlay">
+  <div class="cicatrice-modal">
+    <div class="cicatrice-modal-title">Scegli il tuo PG</div>
+    <div class="pg-list" id="pgList"></div>
+  </div>
+</div>
+
 <!-- TOAST -->
 <div class="toast" id="toast"></div>
 
@@ -1510,6 +1564,7 @@
     } catch (e) {
       showToast('Impossibile salvare i dati.');
     }
+    schedulePush();
   }
 
   /* ─── TOAST ─────────────────────────────────────────────────── */
@@ -1534,7 +1589,7 @@
   });
 
   // Espone globalmente per i moduli successivi
-  window.DH = { state, saveState, showToast, loadState };
+  window.DH = { state, saveState, showToast, loadState, renders: [] };
 
 
   /* ─── DEATH MOVE MODAL ──────────────────────────────────────── */
@@ -1645,6 +1700,7 @@
       showToast('PF azzerati');
     });
 
+    DH.renders.push(render);
     render();
   })();
 
@@ -1738,6 +1794,7 @@
       showToast('Stress azzerato');
     });
 
+    DH.renders.push(render);
     render();
   })();
 
@@ -1863,6 +1920,7 @@
       showToast('Tesoro azzerato');
     });
 
+    DH.renders.push(render);
     render();
   })();
 
@@ -1938,6 +1996,7 @@
       showToast('Cicatrice segnata — max Speranza: ' + state.speranza.max, 3000);
     });
 
+    DH.renders.push(render);
     render();
   })();
 
@@ -1990,8 +2049,165 @@
     document.getElementById('armorScoreInc').addEventListener('click', () => setScore(+1));
     document.getElementById('armorScoreDec').addEventListener('click', () => setScore(-1));
 
+    DH.renders.push(render);
     render();
   })();
+
+  /* ═══════════════════════════════════════════════════════════════
+     SINCRONIZZAZIONE CON IL COMBAT MANAGER (Firebase REST)
+     Il link del GM porta ?p=<codice party>. Le modifiche locali partono
+     subito; se si è offline restano "da inviare" (dh_dirty) e vengono
+     reinviate appena c'è rete. I massimi li decide il GM.
+  ═══════════════════════════════════════════════════════════════ */
+  const DB = 'https://dh-tracker-fdc50-default-rtdb.europe-west1.firebasedatabase.app';
+
+  const urlParty = new URLSearchParams(location.search).get('p');
+  if (urlParty && urlParty !== localStorage.getItem('dh_party')) {
+    localStorage.setItem('dh_party', urlParty);
+    localStorage.removeItem('dh_pg');
+  }
+  const party = localStorage.getItem('dh_party');
+  let pg = localStorage.getItem('dh_pg');
+
+  const linked = () => !!(party && pg);
+  const pgUrl  = () => `${DB}/parties/${party}/pgs/${pg}.json`;
+
+  function toRemote(s) {
+    return {
+      hpMarked:  s.pf.current,
+      stress:    s.stress.current,
+      hope:      s.speranza.current,
+      maxHope:   s.speranza.max,
+      armorUsed: s.armatura.used,
+      oro:       { ...s.oro }
+    };
+  }
+
+  // gmOnly: con modifiche locali ancora da inviare si prendono solo i campi del GM,
+  // altrimenti un evento in arrivo cancellerebbe il tap appena fatto.
+  function applyRemote(r, gmOnly) {
+    if (r.name != null)       state.charName = r.name;
+    if (r.maxHp != null)      state.pf.max = r.maxHp;
+    if (r.maxStress != null)  state.stress.max = r.maxStress;
+    if (r.armorScore != null) state.armatura.score = r.armorScore;
+    if (!gmOnly) {
+      if (r.maxHope != null)   state.speranza.max = r.maxHope;
+      if (r.hpMarked != null)  state.pf.current = r.hpMarked;
+      if (r.stress != null)    state.stress.current = r.stress;
+      if (r.hope != null)      state.speranza.current = r.hope;
+      if (r.armorUsed != null) state.armatura.used = r.armorUsed;
+      if (r.oro)               state.oro = { ...state.oro, ...r.oro };
+    }
+    state.pf.current       = Math.min(state.pf.current, state.pf.max);
+    state.stress.current   = Math.min(state.stress.current, state.stress.max);
+    state.speranza.current = Math.min(state.speranza.current, state.speranza.max);
+    state.armatura.used    = Math.min(state.armatura.used, state.armatura.score);
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));   // niente push: il dato arriva da fuori
+    renderAll();
+  }
+
+  function renderAll() {
+    charNameEl.value = state.charName;
+    DH.renders.forEach(fn => fn());
+  }
+
+  let pushTimer = null;
+  function schedulePush() {
+    if (!linked()) return;
+    localStorage.setItem('dh_dirty', '1');
+    clearTimeout(pushTimer);
+    pushTimer = setTimeout(push, 300);
+  }
+
+  async function push() {
+    if (!linked()) return;
+    const body = JSON.stringify(toRemote(state));
+    try {
+      const r = await fetch(pgUrl(), { method: 'PATCH', body });
+      // Si pulisce solo se nel frattempo non è cambiato altro
+      if (r.ok && body === JSON.stringify(toRemote(state))) localStorage.removeItem('dh_dirty');
+    } catch {}
+  }
+
+  const syncBar    = document.getElementById('syncBar');
+  const syncStatus = document.getElementById('syncStatus');
+  function setOnline(on) {
+    syncStatus.textContent = on ? '● collegato' : '○ offline';
+    syncBar.classList.toggle('online', on);
+  }
+
+  function listen() {
+    const es = new EventSource(pgUrl());
+    const onEvent = e => {
+      const { path, data } = JSON.parse(e.data);
+      if (path === '/' && data === null) {            // PG eliminato dal GM
+        es.close();
+        unlink();
+        return;
+      }
+      const parts = path.split('/').filter(Boolean);
+      if (parts.length > 1) return;                    // sotto-campi (es. oro/monete): non li scrive nessuno
+      const r = parts.length === 0 ? data : { [parts[0]]: data };
+      applyRemote(r, !!localStorage.getItem('dh_dirty'));
+    };
+    es.addEventListener('put', onEvent);
+    es.addEventListener('patch', onEvent);
+    es.onopen  = () => setOnline(true);
+    es.onerror = () => setOnline(false);
+  }
+
+  function unlink() {
+    localStorage.removeItem('dh_pg');
+    localStorage.removeItem('dh_dirty');
+    location.reload();
+  }
+
+  async function choosePg() {
+    let pgs;
+    try {
+      const r = await fetch(`${DB}/parties/${party}/pgs.json`);
+      pgs = r.ok ? await r.json() : null;
+    } catch {}
+    if (!pgs) {
+      showToast('Party non raggiungibile: sei offline?', 3200);
+      return;
+    }
+    const overlay = document.getElementById('pgOverlay');
+    const list    = document.getElementById('pgList');
+    list.innerHTML = '';
+    for (const [id, p] of Object.entries(pgs)) {
+      const b = document.createElement('button');
+      b.className = 'pg-choice';
+      const dot = document.createElement('span');
+      dot.className = 'pg-dot';
+      dot.style.background = p.color || 'var(--gold)';
+      b.append(dot, document.createTextNode(p.name || 'PG'));
+      b.addEventListener('click', () => {
+        pg = id;
+        localStorage.setItem('dh_pg', id);
+        overlay.classList.remove('visible');
+        startLinked();
+        applyRemote(p, false);
+      });
+      list.appendChild(b);
+    }
+    overlay.classList.add('visible');
+  }
+
+  async function startLinked() {
+    document.body.classList.add('linked');
+    charNameEl.readOnly = true;
+    syncBar.hidden = false;
+    if (localStorage.getItem('dh_dirty')) await push();
+    listen();
+  }
+
+  document.getElementById('changePg').addEventListener('click', unlink);
+  window.addEventListener('online', () => localStorage.getItem('dh_dirty') && push());
+  setInterval(() => localStorage.getItem('dh_dirty') && push(), 15000);
+
+  if (linked()) startLinked();
+  else if (party) choosePg();
 
   if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js');
 
