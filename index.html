@@ -2236,8 +2236,10 @@
     const body = JSON.stringify(toRemote(state));
     try {
       const r = await fetch(pgUrl(), { method: 'PATCH', body });
-      // Si pulisce solo se nel frattempo non è cambiato altro
-      if (r.ok && body === JSON.stringify(toRemote(state))) localStorage.removeItem('dh_dirty');
+      // Un rifiuto del server (4xx) non guarisce riprovando: si lascia perdere invece di
+      // ritentare ogni 15 s per sempre. Si pulisce solo se nel frattempo non è cambiato altro.
+      const done = r.ok || (r.status >= 400 && r.status < 500);
+      if (done && body === JSON.stringify(toRemote(state))) localStorage.removeItem('dh_dirty');
     } catch {}
   }
 
